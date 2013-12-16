@@ -96,17 +96,20 @@ public class GithubController {
       throw new UnauthorizedHookException("Not a valid repository: " + event.getRepository().getUrl());
     }
 
-    Repository   repository = event.getRepository();
-    List<Commit> commits    = getQualifyingCommits(event);
-    BigDecimal   balance    = coinbaseClient.getAccountBalance();
+    Repository   repository   = event.getRepository();
+    List<Commit> commits      = getQualifyingCommits(event);
+    BigDecimal   balance      = coinbaseClient.getAccountBalance();
+    BigDecimal   exchangeRate = coinbaseClient.getExchangeRate();
 
     logger.info("Retrieved balance: " + balance.toPlainString());
 
-    sendPaymentsFor(repository, commits, balance);
+    sendPaymentsFor(repository, commits, balance, exchangeRate);
   }
 
 
-  private void sendPaymentsFor(Repository repository, List<Commit> commits, BigDecimal balance) {
+  private void sendPaymentsFor(Repository repository, List<Commit> commits,
+                               BigDecimal balance, BigDecimal exchangeRate)
+  {
     for (Commit commit : commits) {
       try {
         BigDecimal payout = balance.multiply(payoutRate);
@@ -116,7 +119,9 @@ public class GithubController {
         }
 
         balance = balance.subtract(payout);
-        githubClient.addCommitComment(repository, commit, getCommitCommentStringForPayment(payout));
+
+        githubClient.addCommitComment(repository, commit,
+                                      getCommitCommentStringForPayment(payout, exchangeRate));
       } catch (TransferFailedException e) {
         logger.warn("Transfer failed", e);
       }
@@ -156,10 +161,10 @@ public class GithubController {
     return payment.compareTo(new BigDecimal(0)) == 1;
   }
 
-  private String getCommitCommentStringForPayment(BigDecimal payment) {
+  private String getCommitCommentStringForPayment(BigDecimal payment, BigDecimal exchangeRate) {
     if (isViablePaymentAmount(payment)) {
-      payment = payment.setScale(2, RoundingMode.CEILING);
-      return "Thanks! BitHub has sent payment of  $" + payment.toPlainString() + "USD for this commit.";
+      BigDecimal paymentUsd = payment.multiply(exchangeRate).setScale(2, RoundingMode.CEILING);
+      return "Thanks! BitHub has sent payment of  $" + paymentUsd.toPlainString() + "USD for this commit.";
     } else {
       return "Thanks! Unfortunately our BitHub balance is $0.00, so no payout can be made.";
     }
