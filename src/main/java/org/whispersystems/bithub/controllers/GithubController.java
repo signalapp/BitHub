@@ -148,8 +148,12 @@ public class GithubController {
         logger.info("Unique author: "+ commit.getAuthor().getEmail());
         if (commit.getMessage() == null || !commit.getMessage().startsWith("Merge")) {
           logger.info("Not a merge commit...");
-          emails.add(commit.getAuthor().getEmail());
-          commits.add(commit);
+          
+          //Check for **NOPAY** tag
+          if(!commit.getMessage().contains("**NOPAY**")){
+            emails.add(commit.getAuthor().getEmail());
+            commits.add(commit);
+          }
         }
       }
     }
