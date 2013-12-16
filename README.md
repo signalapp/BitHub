@@ -23,14 +23,15 @@ Running
 Deploying To Heroku
 ------------
 
-1. `$ heroku create your_app_name`
-1. `$ heroku config:set GITHUB_USER=your_bithub_username`
-1. `$ heroku config:set GITHUB_TOKEN=your_bithub_authtoken`
-1. `$ heroku config:set GITHUB_REPOSITORIES="[\"https://github.com/youraccount/yourrepo\", \"https://github.com/youraccount/yourotherrepo\"]"`
-1. `$ heroku config:set COINBASE_API_KEY=your_api_key`
-1. `$ git remote add your_heroku_remote`
-1. `$ git push heroku master`
-
+```
+$ heroku create your_app_name
+$ heroku config:set GITHUB_USER=your_bithub_username
+$ heroku config:set GITHUB_TOKEN=your_bithub_authtoken
+$ heroku config:set GITHUB_REPOSITORIES="[\"https://github.com/youraccount/yourrepo\", \"https://github.com/youraccount/yourotherrepo\"]"
+$ heroku config:set COINBASE_API_KEY=your_api_key
+$ git remote add your_heroku_remote
+$ git push heroku master
+```
 
 Mailing list
 ------------
