@@ -42,6 +42,7 @@ import static org.mockito.Mockito.when;
 public class GithubControllerTest extends ResourceTest {
 
   private static final BigDecimal BALANCE = new BigDecimal(10.01);
+  private static final BigDecimal EXCHANGE_RATE = new BigDecimal(1.0);
 
   private final CoinbaseClient coinbaseClient = mock(CoinbaseClient.class);
   private final GithubClient   githubClient   = mock(GithubClient.class);
@@ -53,6 +54,7 @@ public class GithubControllerTest extends ResourceTest {
   @Override
   protected void setUpResources() throws Exception {
     when(coinbaseClient.getAccountBalance()).thenReturn(BALANCE);
+    when(coinbaseClient.getExchangeRate()).thenReturn(EXCHANGE_RATE);
     addResource(new GithubController(repositories, githubClient, coinbaseClient, new BigDecimal(0.02)));
     addProvider(new UnauthorizedHookExceptionMapper());
   }
