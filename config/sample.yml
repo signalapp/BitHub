@@ -1,0 +1,8 @@
+github:
+  user: # Your BitHub instance's GitHub username.
+  token: # Your BitHub instance's GitHub auth token.
+  repositories:
+    - # A list of repository URLs to support payouts for.
+
+coinbase:
+  apiKey: # Your Coinbase API key.
