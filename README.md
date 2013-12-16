@@ -1,6 +1,8 @@
 BitHub
 =================
 
+[![Build Status](https://travis-ci.org/WhisperSystems/BitHub.png?branch=master)](https://travis-ci.org/WhisperSystems/BitHub)
+
 BitHub is a service that will automatically pay a percentage of Bitcoin funds for every submission to a GitHub repository.
 
 Building
