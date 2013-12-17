@@ -38,15 +38,17 @@ public class TransactionView {
 
   private final String destination;
   private final String amount;
+  private final String amountInBTC;
   private final String commitUrl;
   private final String commitSha;
   private final String timestamp;
 
-  public TransactionView(BigDecimal exchangeRate, String amount,
+  public TransactionView(BigDecimal exchangeRate, String transactionAmount,
                          String timestamp, String message)
       throws ParseException
   {
-    this.amount      = getAmountInDollars(exchangeRate, amount);
+    this.amount      = getAmountInDollars(exchangeRate, transactionAmount);
+    this.amountInBTC   = getAmountInBTC(transactionAmount);
     this.destination = parseDestinationFromMessage(message);
     this.timestamp   = parseTimestamp(timestamp);
     this.commitUrl   = parseUrlFromMessage(message);
@@ -57,6 +59,12 @@ public class TransactionView {
     return new BigDecimal(amount).abs()
                                  .multiply(exchangeRate)
                                  .setScale(2, RoundingMode.CEILING)
+                                 .toPlainString();
+  }
+
+  private String getAmountInBTC(String amount) {
+    return new BigDecimal(amount).abs()
+                                 .setScale(4, RoundingMode.CEILING)
                                  .toPlainString();
   }
 
@@ -111,6 +119,10 @@ public class TransactionView {
 
   public String getAmount() {
     return amount;
+  }
+
+  public String getAmountInBTC() {
+    return amountInBTC;
   }
 
   public String getCommitUrl() {

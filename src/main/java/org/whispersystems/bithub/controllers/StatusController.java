@@ -117,6 +117,7 @@ public class StatusController {
     return new RecentTransactionsView(recentTransactions, exchangeRate);
   }
 
+
   public void initializeUpdates(final CoinbaseClient coinbaseClient) {
     executor.scheduleAtFixedRate(new Runnable() {
       @Override
