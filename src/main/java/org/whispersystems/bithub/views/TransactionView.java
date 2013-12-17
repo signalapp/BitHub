@@ -43,20 +43,20 @@ public class TransactionView {
   private final String timestamp;
 
   public TransactionView(BigDecimal exchangeRate, String amount,
-                         String timestamp, String message)
+                         String timestamp, String message, int scale)
       throws ParseException
   {
-    this.amount      = getAmountInDollars(exchangeRate, amount);
+    this.amount      = getAmountInDollars(exchangeRate, amount, scale);
     this.destination = parseDestinationFromMessage(message);
     this.timestamp   = parseTimestamp(timestamp);
     this.commitUrl   = parseUrlFromMessage(message);
     this.commitSha   = parseShaFromUrl(commitUrl);
   }
 
-  private String getAmountInDollars(BigDecimal exchangeRate, String amount) {
+  private String getAmountInDollars(BigDecimal exchangeRate, String amount, int scale) {
     return new BigDecimal(amount).abs()
                                  .multiply(exchangeRate)
-                                 .setScale(2, RoundingMode.CEILING)
+                                 .setScale(scale, RoundingMode.CEILING)
                                  .toPlainString();
   }
 
