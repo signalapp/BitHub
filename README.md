@@ -5,6 +5,12 @@ BitHub
 
 BitHub is a service that will automatically pay a percentage of Bitcoin funds for every submission to a GitHub repository.
 
+Opting Out
+----------
+
+If your conscience is troubled at recieving payment for changing a few lines of documentation, simply add "FREEBIE" to your commit message, and you will not recieve BTC for that commit.
+
+
 Building
 -------------
 
