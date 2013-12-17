@@ -5,6 +5,8 @@ BitHub
 
 BitHub is a service that will automatically pay a percentage of Bitcoin funds for every submission to a GitHub repository.
 
+More information can be found in our [announcement blog post](https://whispersystems.org/blog/bithub).
+
 Opting Out
 ----------
 
