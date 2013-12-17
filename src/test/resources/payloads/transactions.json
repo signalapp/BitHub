@@ -1,0 +1,59 @@
+{
+    "current_user": {
+        "id": "5011f33df8182b142400000e",
+        "email": "user2@example.com",
+        "name": "User Two"
+    },
+    "balance": {
+        "amount": "50.00000000",
+        "currency": "BTC"
+    },
+    "total_count": 2,
+    "num_pages": 1,
+    "current_page": 1,
+    "transactions": [
+        {
+            "transaction": {
+                "id": "5018f833f8182b129c00002f",
+                "created_at": "2012-08-01T02:34:43-07:00",
+                "amount": {
+                    "amount": "-1.10000000",
+                    "currency": "BTC"
+                },
+                "request": true,
+                "status": "pending",
+                "sender": {
+                    "id": "5011f33df8182b142400000e",
+                    "name": "User Two",
+                    "email": "user2@example.com"
+                },
+                "recipient": {
+                    "id": "5011f33df8182b142400000a",
+                    "name": "User One",
+                    "email": "user1@example.com"
+                },
+                "notes": "Commit payment:__moxie0__ https://github.com/WhisperSystems/BitHub/commit/88edf54e5b57c80ac05093a9be90965fd41291c2"
+            }
+        },
+        {
+            "transaction": {
+                "id": "5018f833f8182b129c00002e",
+                "created_at": "2012-08-01T02:36:43-07:00",
+                "hsh": "9d6a7d1112c3db9de5315b421a5153d71413f5f752aff75bf504b77df4e646a3",
+                "amount": {
+                    "amount": "-1.00000000",
+                    "currency": "BTC"
+                },
+                "request": false,
+                "status": "complete",
+                "sender": {
+                    "id": "5011f33df8182b142400000e",
+                    "name": "User Two",
+                    "email": "user2@example.com"
+                },
+                "recipient_address": "37muSN5ZrukVTvyVh3mT5Zc5ew9L9CBare",
+                "notes": "Commit payment:__moxie0__ https://github.com/WhisperSystems/BitHub/commit/88edf54e5b57c80ac05093a9be90965fd41291c2"
+            }
+        }
+    ]
+}
