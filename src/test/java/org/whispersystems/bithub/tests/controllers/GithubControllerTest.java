@@ -32,6 +32,8 @@ import javax.ws.rs.core.MediaType;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Scanner;
+import java.io.InputStream;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.Matchers.*;
@@ -57,9 +59,15 @@ public class GithubControllerTest extends ResourceTest {
     addProvider(new UnauthorizedHookExceptionMapper());
   }
 
+  protected String payload(String path) {
+    InputStream is = this.getClass().getResourceAsStream(path);
+    Scanner s = new Scanner(is).useDelimiter("\\A");
+    return s.hasNext() ? s.next() : "";
+  }
+
   @Test
   public void testInvalidRepository() throws Exception {
-    String payloadValue = "{\"ref\":\"refs/heads/master\",\"after\":\"100e9859651b35a3505cc278e9a98a076f79940b\",\"before\":\"6626766348ab245bdb3351989f753bd6e792524a\",\"created\":false,\"deleted\":false,\"forced\":false,\"compare\":\"https://github.com/moxie0/tempt/compare/6626766348ab...100e9859651b\",\"commits\":[{\"id\":\"fd7daeb1de6d72220b1313a7f1112d43885013aa\",\"distinct\":true,\"message\":\"Update foo\",\"timestamp\":\"2013-12-14T11:27:00-08:00\",\"url\":\"https://github.com/moxie0/tempt/commit/fd7daeb1de6d72220b1313a7f1112d43885013aa\",\"author\":{\"name\":\"WhisperBTC\",\"email\":\"info@whispersystems.org\",\"username\":\"WhisperBTC\"},\"committer\":{\"name\":\"WhisperBTC\",\"email\":\"info@whispersystems.org\",\"username\":\"WhisperBTC\"},\"added\":[],\"removed\":[],\"modified\":[\"foo\"]},{\"id\":\"100e9859651b35a3505cc278e9a98a076f79940b\",\"distinct\":true,\"message\":\"Merge pull request #2 from WhisperBTC/patch-2\\n\\nUpdate foo\",\"timestamp\":\"2013-12-14T11:27:28-08:00\",\"url\":\"https://github.com/moxie0/tempt/commit/100e9859651b35a3505cc278e9a98a076f79940b\",\"author\":{\"name\":\"Moxie Marlinspike\",\"email\":\"moxie@thoughtcrime.org\",\"username\":\"moxie0\"},\"committer\":{\"name\":\"Moxie Marlinspike\",\"email\":\"moxie@thoughtcrime.org\",\"username\":\"moxie0\"},\"added\":[],\"removed\":[],\"modified\":[\"foo\"]}],\"head_commit\":{\"id\":\"100e9859651b35a3505cc278e9a98a076f79940b\",\"distinct\":true,\"message\":\"Merge pull request #2 from WhisperBTC/patch-2\\n\\nUpdate foo\",\"timestamp\":\"2013-12-14T11:27:28-08:00\",\"url\":\"https://github.com/moxie0/tempt/commit/100e9859651b35a3505cc278e9a98a076f79940b\",\"author\":{\"name\":\"Moxie Marlinspike\",\"email\":\"moxie@thoughtcrime.org\",\"username\":\"moxie0\"},\"committer\":{\"name\":\"Moxie Marlinspike\",\"email\":\"moxie@thoughtcrime.org\",\"username\":\"moxie0\"},\"added\":[],\"removed\":[],\"modified\":[\"foo\"]},\"repository\":{\"id\":15141344,\"name\":\"tempt\",\"url\":\"https://github.com/moxie0/tempt\",\"description\":\"test\",\"watchers\":1,\"stargazers\":1,\"forks\":1,\"fork\":false,\"size\":216,\"owner\":{\"name\":\"moxie0\",\"email\":\"moxie@thoughtcrime.org\"},\"private\":false,\"open_issues\":0,\"has_issues\":true,\"has_downloads\":true,\"has_wiki\":true,\"created_at\":1386866024,\"pushed_at\":1387049248,\"master_branch\":\"master\"},\"pusher\":{\"name\":\"moxie0\",\"email\":\"moxie@thoughtcrime.org\"}}";
+    String payloadValue = payload("/payloads/invalid_repo.json");
     MultivaluedMapImpl post = new MultivaluedMapImpl();
     post.add("payload", payloadValue);
     ClientResponse response = client().resource("/v1/github/commits/")
@@ -72,7 +80,7 @@ public class GithubControllerTest extends ResourceTest {
 
   @Test
   public void testInvalidOrigin() throws Exception {
-    String payloadValue = "{\"ref\":\"refs/heads/master\",\"after\":\"100e9859651b35a3505cc278e9a98a076f79940b\",\"before\":\"6626766348ab245bdb3351989f753bd6e792524a\",\"created\":false,\"deleted\":false,\"forced\":false,\"compare\":\"https://github.com/moxie0/tempt/compare/6626766348ab...100e9859651b\",\"commits\":[{\"id\":\"fd7daeb1de6d72220b1313a7f1112d43885013aa\",\"distinct\":true,\"message\":\"Update foo\",\"timestamp\":\"2013-12-14T11:27:00-08:00\",\"url\":\"https://github.com/moxie0/tempt/commit/fd7daeb1de6d72220b1313a7f1112d43885013aa\",\"author\":{\"name\":\"WhisperBTC\",\"email\":\"info@whispersystems.org\",\"username\":\"WhisperBTC\"},\"committer\":{\"name\":\"WhisperBTC\",\"email\":\"info@whispersystems.org\",\"username\":\"WhisperBTC\"},\"added\":[],\"removed\":[],\"modified\":[\"foo\"]},{\"id\":\"100e9859651b35a3505cc278e9a98a076f79940b\",\"distinct\":true,\"message\":\"Merge pull request #2 from WhisperBTC/patch-2\\n\\nUpdate foo\",\"timestamp\":\"2013-12-14T11:27:28-08:00\",\"url\":\"https://github.com/moxie0/tempt/commit/100e9859651b35a3505cc278e9a98a076f79940b\",\"author\":{\"name\":\"Moxie Marlinspike\",\"email\":\"moxie@thoughtcrime.org\",\"username\":\"moxie0\"},\"committer\":{\"name\":\"Moxie Marlinspike\",\"email\":\"moxie@thoughtcrime.org\",\"username\":\"moxie0\"},\"added\":[],\"removed\":[],\"modified\":[\"foo\"]}],\"head_commit\":{\"id\":\"100e9859651b35a3505cc278e9a98a076f79940b\",\"distinct\":true,\"message\":\"Merge pull request #2 from WhisperBTC/patch-2\\n\\nUpdate foo\",\"timestamp\":\"2013-12-14T11:27:28-08:00\",\"url\":\"https://github.com/moxie0/tempt/commit/100e9859651b35a3505cc278e9a98a076f79940b\",\"author\":{\"name\":\"Moxie Marlinspike\",\"email\":\"moxie@thoughtcrime.org\",\"username\":\"moxie0\"},\"committer\":{\"name\":\"Moxie Marlinspike\",\"email\":\"moxie@thoughtcrime.org\",\"username\":\"moxie0\"},\"added\":[],\"removed\":[],\"modified\":[\"foo\"]},\"repository\":{\"id\":15141344,\"name\":\"tempt\",\"url\":\"https://github.com/moxie0/test\",\"description\":\"test\",\"watchers\":1,\"stargazers\":1,\"forks\":1,\"fork\":false,\"size\":216,\"owner\":{\"name\":\"moxie0\",\"email\":\"moxie@thoughtcrime.org\"},\"private\":false,\"open_issues\":0,\"has_issues\":true,\"has_downloads\":true,\"has_wiki\":true,\"created_at\":1386866024,\"pushed_at\":1387049248,\"master_branch\":\"master\"},\"pusher\":{\"name\":\"moxie0\",\"email\":\"moxie@thoughtcrime.org\"}}";
+    String payloadValue = payload("/payloads/invalid_origin.json");
     MultivaluedMapImpl post = new MultivaluedMapImpl();
     post.add("payload", payloadValue);
     ClientResponse response = client().resource("/v1/github/commits/")
@@ -84,8 +92,24 @@ public class GithubControllerTest extends ResourceTest {
   }
 
   @Test
+  public void testOptOutCommit() throws Exception, TransferFailedException {
+    String payloadValue = payload("/payloads/opt_out_commit.json");
+    MultivaluedMapImpl post = new MultivaluedMapImpl();
+    post.add("payload", payloadValue);
+    ClientResponse response = client().resource("/v1/github/commits/")
+        .header("X-Forwarded-For", "192.30.252.1")
+        .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
+        .post(ClientResponse.class, post);
+
+    verify(coinbaseClient, never()).sendPayment(any(Author.class),
+                                       any(BigDecimal.class),
+                                       anyString());
+  }
+
+
+  @Test
   public void testValidCommit() throws Exception, TransferFailedException {
-    String payloadValue = "{\"ref\":\"refs/heads/master\",\"after\":\"bcf09f8b4a32921114587e4814a3f0849aa9900f\",\"before\":\"1b141aa068165dd1ed376f483cd5fdc2c64f32b1\",\"created\":false,\"deleted\":false,\"forced\":false,\"compare\":\"https://github.com/moxie0/tempt/compare/1b141aa06816...bcf09f8b4a32\",\"commits\":[{\"id\":\"ba1b681c71db4fcd461954b1bf344bc6e29411e5\",\"distinct\":true,\"message\":\"Update path\",\"timestamp\":\"2013-12-14T11:42:28-08:00\",\"url\":\"https://github.com/moxie0/tempt/commit/ba1b681c71db4fcd461954b1bf344bc6e29411e5\",\"author\":{\"name\":\"Moxie Marlinspike\",\"email\":\"moxie@thoughtcrime.org\",\"username\":\"moxie0\"},\"committer\":{\"name\":\"Moxie Marlinspike\",\"email\":\"moxie@thoughtcrime.org\",\"username\":\"moxie0\"},\"added\":[],\"removed\":[],\"modified\":[\"README.md\"]},{\"id\":\"bcf09f8b4a32921114587e4814a3f0849aa9900f\",\"distinct\":true,\"message\":\"Merge branch 'master' of github.com:moxie0/tempt\",\"timestamp\":\"2013-12-14T11:42:44-08:00\",\"url\":\"https://github.com/moxie0/tempt/commit/bcf09f8b4a32921114587e4814a3f0849aa9900f\",\"author\":{\"name\":\"Moxie Marlinspike\",\"email\":\"moxie@thoughtcrime.org\",\"username\":\"moxie0\"},\"committer\":{\"name\":\"Moxie Marlinspike\",\"email\":\"moxie@thoughtcrime.org\",\"username\":\"moxie0\"},\"added\":[],\"removed\":[],\"modified\":[]}],\"head_commit\":{\"id\":\"bcf09f8b4a32921114587e4814a3f0849aa9900f\",\"distinct\":true,\"message\":\"Merge branch 'master' of github.com:moxie0/tempt\",\"timestamp\":\"2013-12-14T11:42:44-08:00\",\"url\":\"https://github.com/moxie0/tempt/commit/bcf09f8b4a32921114587e4814a3f0849aa9900f\",\"author\":{\"name\":\"Moxie Marlinspike\",\"email\":\"moxie@thoughtcrime.org\",\"username\":\"moxie0\"},\"committer\":{\"name\":\"Moxie Marlinspike\",\"email\":\"moxie@thoughtcrime.org\",\"username\":\"moxie0\"},\"added\":[],\"removed\":[],\"modified\":[]},\"repository\":{\"id\":15141344,\"name\":\"tempt\",\"url\":\"https://github.com/moxie0/test\",\"description\":\"test\",\"watchers\":1,\"stargazers\":1,\"forks\":1,\"fork\":false,\"size\":216,\"owner\":{\"name\":\"moxie0\",\"email\":\"moxie@thoughtcrime.org\"},\"private\":false,\"open_issues\":0,\"has_issues\":true,\"has_downloads\":true,\"has_wiki\":true,\"created_at\":1386866024,\"pushed_at\":1387050173,\"master_branch\":\"master\"},\"pusher\":{\"name\":\"moxie0\",\"email\":\"moxie@thoughtcrime.org\"}}";
+    String payloadValue = payload("/payloads/valid_commit.json");
     MultivaluedMapImpl post = new MultivaluedMapImpl();
     post.add("payload", payloadValue);
     ClientResponse response = client().resource("/v1/github/commits/")

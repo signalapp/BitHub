@@ -146,8 +146,9 @@ public class GithubController {
       logger.info(commit.getUrl());
       if (!emails.contains(commit.getAuthor().getEmail())) {
         logger.info("Unique author: "+ commit.getAuthor().getEmail());
-        if (commit.getMessage() == null || !commit.getMessage().startsWith("Merge")) {
+        if (commit.getMessage() == null || !commit.getMessage().startsWith("Merge") && (!commit.getMessage().contains("NOPAY"))) {
           logger.info("Not a merge commit...");
+          
           emails.add(commit.getAuthor().getEmail());
           commits.add(commit);
         }
