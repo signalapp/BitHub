@@ -8,7 +8,7 @@ BitHub is a service that will automatically pay a percentage of Bitcoin funds fo
 Opting Out
 ----------
 
-If your conscience is troubled at recieving payment for changing a few lines of documentation, simply add "FREEBIE" to your commit message, and you will not recieve BTC for that commit.
+If you'd like to opt out of receiving a payment, simply include the string "FREEBIE" somewhere in your commit message, and you will not recieve BTC for that commit.
 
 
 Building
