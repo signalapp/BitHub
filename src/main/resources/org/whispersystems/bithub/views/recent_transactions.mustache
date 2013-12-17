@@ -44,7 +44,7 @@
 
 <ul>
     {{#transactions}}
-    <li>Sent ${{amount}} USD to <a href="https://github.com/{{destination}}" target="_blank">{{destination}}</a> for <a href="{{commitUrl}}" target="_blank"><sha>{{commitSha}}</sha></a> {{timestamp}}.</li>
+    <li>Sent ${{amount}} USD ({{btcAmount}} BTC) to <a href="https://github.com/{{destination}}" target="_blank">{{destination}}</a> for <a href="{{commitUrl}}" target="_blank"><sha>{{commitSha}}</sha></a> {{timestamp}}.</li>
     {{/transactions}}
 </ul>
 
