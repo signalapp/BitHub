@@ -24,6 +24,8 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,6 +47,11 @@ public class GithubConfiguration {
 
   @JsonProperty
   private String repositories_heroku;
+
+  @Valid
+  @NotNull
+  @JsonProperty
+  private WebhookConfiguration webhook;
 
   public String getUser() {
     return user;
@@ -69,5 +76,9 @@ public class GithubConfiguration {
     }
 
     return new LinkedList<>();
+  }
+
+  public WebhookConfiguration getWebhookConfiguration() {
+    return webhook;
   }
 }

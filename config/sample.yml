@@ -3,6 +3,8 @@ github:
   token: # Your BitHub instance's GitHub auth token.
   repositories:
     - # A list of repository URLs to support payouts for.
+  webhook:
+    password: # HTTP basic auth. The username defaults to "bithub".
 
 coinbase:
   apiKey: # Your Coinbase API key.
