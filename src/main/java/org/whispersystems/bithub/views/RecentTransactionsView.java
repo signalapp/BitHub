@@ -39,7 +39,7 @@ public class RecentTransactionsView extends View {
 
   public RecentTransactionsView(List<Transaction> recentTransactions, BigDecimal exchangeRate) {
     super("recent_transactions.mustache");
-
+    
     for (Transaction transaction : recentTransactions) {
       try {
         if (isSentTransaction(transaction)) {

@@ -45,6 +45,7 @@ public class StatusControllerTest extends ResourceTest {
 
     assertThat(response.getStatus()).isEqualTo(200);
     assertThat(response.getType()).isEqualTo(MediaType.TEXT_HTML_TYPE);
+    assertThat(response.getEntity(String.class)).contains("<li>Sent $1.10 USD (1.1000 BTC)");
   }
 
   @Test
@@ -54,6 +55,7 @@ public class StatusControllerTest extends ResourceTest {
 
     assertThat(response.getStatus()).isEqualTo(200);
     assertThat(response.getType()).isEqualTo(MediaType.APPLICATION_JSON_TYPE);
+    assertThat(response.getEntity(String.class)).contains("\"amount\":\"1.10\",\"amountInBTC\":\"1.1000\"");
   }
 
 }
