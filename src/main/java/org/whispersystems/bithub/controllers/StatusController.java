@@ -56,14 +56,12 @@ public class StatusController {
 
   private final AtomicReference<CurrentPayment>         cachedPaymentStatus;
   private final AtomicReference<RecentTransactionsView> cachedTransactions;
-  private final AtomicReference<RecentTransactionsView> cachedTransactionsInBTC;
   private final BigDecimal                              payoutRate;
 
   public StatusController(CoinbaseClient coinbaseClient, BigDecimal payoutRate) throws IOException {
     this.payoutRate          = payoutRate;
     this.cachedPaymentStatus = new AtomicReference<>(createCurrentPaymentForBalance(coinbaseClient));
     this.cachedTransactions  = new AtomicReference<>(createRecentTransactionsView(coinbaseClient));
-    this.cachedTransactionsInBTC = new AtomicReference<>(createRecentTransactionsViewInBTC());
 
     initializeUpdates(coinbaseClient);
   }
@@ -78,19 +76,6 @@ public class StatusController {
       return Response.ok(cachedTransactions.get(), MediaType.APPLICATION_JSON_TYPE).build();
     } else {
       return Response.ok(cachedTransactions.get(), MediaType.TEXT_HTML_TYPE).build();
-    }
-  }
-
-  @Timed
-  @GET
-  @Path("/transactions/BTC")
-  public Response getTransactions(@QueryParam("format") @DefaultValue("html") String format)
-      throws IOException
-  {
-    if (format.equals("json")) {
-      return Response.ok(cachedTransactionsInBTC.get(), MediaType.APPLICATION_JSON_TYPE).build();
-    } else {
-      return Response.ok(cachedTransactionsInBTC.get(), MediaType.TEXT_HTML_TYPE).build();
     }
   }
 
@@ -132,14 +117,6 @@ public class StatusController {
     return new RecentTransactionsView(recentTransactions, exchangeRate);
   }
 
-  private RecentTransactionsView createRecentTransactionsViewInBTC()
-      throws IOException
-  {
-    List<Transaction> recentTransactions = coinbaseClient.getRecentTransactions();
-    BigDecimal        exchangeRate       = new BigDecimal(1.0);
-
-    return new RecentTransactionsView(recentTransactions, exchangeRate);
-  }
 
   public void initializeUpdates(final CoinbaseClient coinbaseClient) {
     executor.scheduleAtFixedRate(new Runnable() {

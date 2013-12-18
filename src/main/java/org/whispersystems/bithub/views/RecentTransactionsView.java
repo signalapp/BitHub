@@ -38,22 +38,15 @@ public class RecentTransactionsView extends View {
   private final List<TransactionView> transactions = new LinkedList<>();
 
   public RecentTransactionsView(List<Transaction> recentTransactions, BigDecimal exchangeRate) {
-    if(exhangeRate.compareTo(new BigDecimal(1.0) != 0){
-      super("recent_transactions.mustache");
-    } else {
-      super("recent_transactions_btc.mustache");
-    }
-
+    super("recent_transactions.mustache");
+    
     for (Transaction transaction : recentTransactions) {
       try {
         if (isSentTransaction(transaction)) {
-          int scale = 2;
-          if (exchangeRate.compareTo(new BigDecimal(1.0)) == 0){scale = 4}
           transactions.add(new TransactionView(exchangeRate,
                                                transaction.getAmount(),
                                                transaction.getCreatedTime(),
-                                               transaction.getNotes()),
-                                               scale);
+                                               transaction.getNotes()));
         }
       } catch (ParseException e) {
         logger.warn("Error parsing: ", e);
