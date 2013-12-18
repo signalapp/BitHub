@@ -10,7 +10,7 @@ More information can be found in our [announcement blog post](https://whispersys
 Opting Out
 ----------
 
-If you'd like to opt out of receiving a payment, simply include the string "FREEBIE" somewhere in your commit message, and you will not recieve BTC for that commit.
+If you'd like to opt out of receiving a payment, simply include the string "FREEBIE" somewhere in your commit message, and you will not receive BTC for that commit.
 
 
 Building
