@@ -22,6 +22,7 @@ import com.yammer.dropwizard.config.Configuration;
 import org.whispersystems.bithub.config.BithubConfiguration;
 import org.whispersystems.bithub.config.CoinbaseConfiguration;
 import org.whispersystems.bithub.config.GithubConfiguration;
+import org.whispersystems.bithub.config.WebhookConfiguration;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;

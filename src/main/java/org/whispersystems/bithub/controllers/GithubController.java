@@ -18,11 +18,13 @@
 package org.whispersystems.bithub.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yammer.dropwizard.auth.Auth;
 import com.yammer.metrics.annotation.Timed;
 import org.apache.commons.net.util.SubnetUtils;
 import org.apache.commons.net.util.SubnetUtils.SubnetInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.whispersystems.bithub.auth.GithubWebhookAuthenticator.Authentication;
 import org.whispersystems.bithub.client.CoinbaseClient;
 import org.whispersystems.bithub.client.GithubClient;
 import org.whispersystems.bithub.client.TransferFailedException;
@@ -85,8 +87,9 @@ public class GithubController {
   @POST
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   @Path("/commits/")
-  public void handleCommits(@HeaderParam("X-Forwarded-For") String clientIp,
-                            @FormParam("payload")           String eventString)
+  public void handleCommits(@Auth Authentication auth,
+                            @HeaderParam("X-Forwarded-For") String clientIp,
+                            @FormParam("payload") String eventString)
       throws IOException, UnauthorizedHookException
   {
     authenticate(clientIp);

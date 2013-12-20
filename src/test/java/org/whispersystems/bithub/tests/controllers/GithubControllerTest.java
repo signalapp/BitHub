@@ -19,8 +19,11 @@ package org.whispersystems.bithub.tests.controllers;
 
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
+import com.yammer.dropwizard.auth.basic.BasicAuthProvider;
 import com.yammer.dropwizard.testing.ResourceTest;
+import org.apache.commons.codec.binary.Base64;
 import org.junit.Test;
+import org.whispersystems.bithub.auth.GithubWebhookAuthenticator;
 import org.whispersystems.bithub.client.CoinbaseClient;
 import org.whispersystems.bithub.client.GithubClient;
 import org.whispersystems.bithub.client.TransferFailedException;
@@ -47,6 +50,14 @@ public class GithubControllerTest extends ResourceTest {
   private final CoinbaseClient coinbaseClient = mock(CoinbaseClient.class);
   private final GithubClient   githubClient   = mock(GithubClient.class);
 
+  // HTTP Basic Authentication data
+  private final String authUsername = "TestUser";
+  private final String authPassword = "TestPassword";
+  private final String authRealm = GithubWebhookAuthenticator.REALM;
+  private final String authString = "Basic " + Base64.encodeBase64String((authUsername + ":" + authPassword).getBytes());
+  private final String invalidUserAuthString = "Basic " + Base64.encodeBase64(("wrong:" + authPassword).getBytes());
+  private final String invalidPasswordAuthString = "Basic " + Base64.encodeBase64((authUsername + ":wrong").getBytes());
+
   private final List<String> repositories = new LinkedList<String>() {{
     add("https://github.com/moxie0/test");
   }};
@@ -57,6 +68,7 @@ public class GithubControllerTest extends ResourceTest {
     when(coinbaseClient.getExchangeRate()).thenReturn(EXCHANGE_RATE);
     addResource(new GithubController(repositories, githubClient, coinbaseClient, new BigDecimal(0.02)));
     addProvider(new UnauthorizedHookExceptionMapper());
+    addProvider(new BasicAuthProvider<>(new GithubWebhookAuthenticator(authUsername, authPassword), authRealm));
   }
 
   protected String payload(String path) {
@@ -72,6 +84,7 @@ public class GithubControllerTest extends ResourceTest {
     post.add("payload", payloadValue);
     ClientResponse response = client().resource("/v1/github/commits/")
         .header("X-Forwarded-For", "192.30.252.1")
+        .header("Authorization", authString)
         .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
         .post(ClientResponse.class, post);
 
@@ -85,8 +98,50 @@ public class GithubControllerTest extends ResourceTest {
     post.add("payload", payloadValue);
     ClientResponse response = client().resource("/v1/github/commits/")
         .header("X-Forwarded-For", "192.30.242.1")
+        .header("Authorization", authString)
         .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
         .post(ClientResponse.class, post);
+
+    assertThat(response.getStatus()).isEqualTo(401);
+  }
+
+  @Test
+  public void testMissingAuth() throws Exception, TransferFailedException {
+      String payloadValue = payload("/payloads/valid_commit.json");
+      MultivaluedMapImpl post = new MultivaluedMapImpl();
+      post.add("payload", payloadValue);
+      ClientResponse response = client().resource("/v1/github/commits/")
+              .header("X-Forwarded-For", "192.30.252.1")
+              .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
+              .post(ClientResponse.class, post);
+
+    assertThat(response.getStatus()).isEqualTo(401);
+  }
+
+  @Test
+  public void testInvalidAuthUser() throws Exception, TransferFailedException {
+      String payloadValue = payload("/payloads/valid_commit.json");
+      MultivaluedMapImpl post = new MultivaluedMapImpl();
+      post.add("payload", payloadValue);
+      ClientResponse response = client().resource("/v1/github/commits/")
+              .header("X-Forwarded-For", "192.30.252.1")
+              .header("Authorization", invalidUserAuthString)
+              .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
+              .post(ClientResponse.class, post);
+
+    assertThat(response.getStatus()).isEqualTo(401);
+  }
+
+  @Test
+  public void testInvalidAuthPassword() throws Exception, TransferFailedException {
+      String payloadValue = payload("/payloads/valid_commit.json");
+      MultivaluedMapImpl post = new MultivaluedMapImpl();
+      post.add("payload", payloadValue);
+      ClientResponse response = client().resource("/v1/github/commits/")
+              .header("X-Forwarded-For", "192.30.252.1")
+              .header("Authorization", invalidPasswordAuthString)
+              .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
+              .post(ClientResponse.class, post);
 
     assertThat(response.getStatus()).isEqualTo(401);
   }
@@ -98,6 +153,7 @@ public class GithubControllerTest extends ResourceTest {
     post.add("payload", payloadValue);
     ClientResponse response = client().resource("/v1/github/commits/")
         .header("X-Forwarded-For", "192.30.252.1")
+        .header("Authorization", authString)
         .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
         .post(ClientResponse.class, post);
 
@@ -113,6 +169,7 @@ public class GithubControllerTest extends ResourceTest {
     post.add("payload", payloadValue);
     ClientResponse response = client().resource("/v1/github/commits/")
         .header("X-Forwarded-For", "192.30.252.1")
+        .header("Authorization", authString)
         .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
         .post(ClientResponse.class, post);
 
@@ -126,8 +183,11 @@ public class GithubControllerTest extends ResourceTest {
     String payloadValue = payload("/payloads/multiple_commits_authors.json");
     MultivaluedMapImpl post = new MultivaluedMapImpl();
     post.add("payload", payloadValue);
-    ClientResponse response = client().resource("/v1/github/commits/").header("X-Forwarded-For", "192.30.252.1")
-        .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, post);
+    ClientResponse response = client().resource("/v1/github/commits/")
+        .header("X-Forwarded-For", "192.30.252.1")
+        .header("Authorization", authString)
+        .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
+        .post(ClientResponse.class, post);
 
     verify(coinbaseClient, times(1)).sendPayment(any(Author.class), eq(BALANCE.multiply(new BigDecimal(0.02))),
         anyString());

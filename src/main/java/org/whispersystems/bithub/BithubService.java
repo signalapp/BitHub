@@ -18,9 +18,11 @@
 package org.whispersystems.bithub;
 
 import com.yammer.dropwizard.Service;
+import com.yammer.dropwizard.auth.basic.BasicAuthProvider;
 import com.yammer.dropwizard.config.Bootstrap;
 import com.yammer.dropwizard.config.Environment;
 import com.yammer.dropwizard.views.ViewBundle;
+import org.whispersystems.bithub.auth.GithubWebhookAuthenticator;
 import org.whispersystems.bithub.client.CoinbaseClient;
 import org.whispersystems.bithub.client.GithubClient;
 import org.whispersystems.bithub.controllers.GithubController;
@@ -51,6 +53,8 @@ public class BithubService extends Service<BithubServerConfiguration> {
   {
     String         githubUser         = config.getGithubConfiguration().getUser();
     String         githubToken        = config.getGithubConfiguration().getToken();
+    String         githubWebhookUser  = config.getGithubConfiguration().getWebhookConfiguration().getUsername();
+    String         githubWebhookPwd   = config.getGithubConfiguration().getWebhookConfiguration().getPassword();
     List<String>   githubRepositories = config.getGithubConfiguration().getRepositories();
     BigDecimal     payoutRate         = config.getBithubConfiguration().getPayoutRate();
     GithubClient   githubClient       = new GithubClient(githubUser, githubToken);
@@ -61,6 +65,8 @@ public class BithubService extends Service<BithubServerConfiguration> {
     environment.addResource(new StatusController(coinbaseClient, payoutRate));
     environment.addProvider(new IOExceptionMapper());
     environment.addProvider(new UnauthorizedHookExceptionMapper());
+    environment.addProvider(new BasicAuthProvider<>(
+      new GithubWebhookAuthenticator(githubWebhookUser, githubWebhookPwd), GithubWebhookAuthenticator.REALM));
   }
 
   public static void main(String[] args) throws Exception {
