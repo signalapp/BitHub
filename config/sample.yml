@@ -1,10 +1,14 @@
 github:
   user: # Your BitHub instance's GitHub username.
   token: # Your BitHub instance's GitHub auth token.
-  repositories:
-    - # A list of repository URLs to support payouts for.
   webhook:
     password: # HTTP basic auth. The username defaults to "bithub".
+  repositories: # A list of repository URLs to support payouts for.
+    - url: # A repository's URL
+      mode: # Either MONEYMONEY (default) or FREEBIE.
+            # The former will pay out on every commit, unless
+            # FREEBIE is specified in the message.  The latter will
+            # only pay out if MONEYMONEY is specified in the message.
 
 coinbase:
   apiKey: # Your Coinbase API key.

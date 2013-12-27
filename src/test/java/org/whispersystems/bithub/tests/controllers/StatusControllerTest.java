@@ -49,7 +49,7 @@ public class StatusControllerTest extends ResourceTest {
 
   @Test
   public void testTransactionsJson() throws Exception {
-    ClientResponse response = client().resource("/v1/status/transactions/").queryParam("format", "json")
+    ClientResponse response = client().resource("/v1/status/transactions/").accept(MediaType.APPLICATION_JSON_TYPE)
         .get(ClientResponse.class);
 
     assertThat(response.getStatus()).isEqualTo(200);

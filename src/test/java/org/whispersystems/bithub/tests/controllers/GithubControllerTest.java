@@ -27,19 +27,22 @@ import org.whispersystems.bithub.auth.GithubWebhookAuthenticator;
 import org.whispersystems.bithub.client.CoinbaseClient;
 import org.whispersystems.bithub.client.GithubClient;
 import org.whispersystems.bithub.client.TransferFailedException;
+import org.whispersystems.bithub.config.RepositoryConfiguration;
 import org.whispersystems.bithub.controllers.GithubController;
 import org.whispersystems.bithub.entities.Author;
 import org.whispersystems.bithub.mappers.UnauthorizedHookExceptionMapper;
 
 import javax.ws.rs.core.MediaType;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
-import java.io.InputStream;
 
 import static org.fest.assertions.api.Assertions.assertThat;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 public class GithubControllerTest extends ResourceTest {
@@ -58,8 +61,9 @@ public class GithubControllerTest extends ResourceTest {
   private final String invalidUserAuthString = "Basic " + Base64.encodeBase64(("wrong:" + authPassword).getBytes());
   private final String invalidPasswordAuthString = "Basic " + Base64.encodeBase64((authUsername + ":wrong").getBytes());
 
-  private final List<String> repositories = new LinkedList<String>() {{
-    add("https://github.com/moxie0/test");
+  private final List<RepositoryConfiguration> repositories = new LinkedList<RepositoryConfiguration>() {{
+    add(new RepositoryConfiguration("https://github.com/moxie0/test"));
+    add(new RepositoryConfiguration("https://github.com/moxie0/optin", "FREEBIE"));
   }};
 
   @Override
@@ -194,5 +198,38 @@ public class GithubControllerTest extends ResourceTest {
     verify(coinbaseClient, times(1)).sendPayment(any(Author.class), eq(BALANCE.subtract(BALANCE.multiply(new BigDecimal(0.02)))
         .multiply(new BigDecimal(0.02))), anyString());
   }
+
+  @Test
+  public void testOptInCommit() throws Exception, TransferFailedException {
+    String payloadValue = payload("/payloads/opt_in_commit.json");
+    MultivaluedMapImpl post = new MultivaluedMapImpl();
+    post.add("payload", payloadValue);
+    ClientResponse response = client().resource("/v1/github/commits/")
+        .header("X-Forwarded-For", "192.30.252.1")
+        .header("Authorization", authString)
+        .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
+        .post(ClientResponse.class, post);
+
+    verify(coinbaseClient).sendPayment(any(Author.class),
+                                       eq(BALANCE.multiply(new BigDecimal(0.02))),
+                                       anyString());
+  }
+
+  @Test
+  public void testNoOptInCommit() throws Exception, TransferFailedException {
+    String payloadValue = payload("/payloads/no_opt_in_commit.json");
+    MultivaluedMapImpl post = new MultivaluedMapImpl();
+    post.add("payload", payloadValue);
+    ClientResponse response = client().resource("/v1/github/commits/")
+        .header("X-Forwarded-For", "192.30.252.1")
+        .header("Authorization", authString)
+        .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
+        .post(ClientResponse.class, post);
+
+    verify(coinbaseClient, never()).sendPayment(any(Author.class),
+                                                any(BigDecimal.class),
+                                                anyString());
+  }
+
 
 }

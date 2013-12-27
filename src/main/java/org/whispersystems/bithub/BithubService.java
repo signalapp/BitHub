@@ -25,6 +25,7 @@ import com.yammer.dropwizard.views.ViewBundle;
 import org.whispersystems.bithub.auth.GithubWebhookAuthenticator;
 import org.whispersystems.bithub.client.CoinbaseClient;
 import org.whispersystems.bithub.client.GithubClient;
+import org.whispersystems.bithub.config.RepositoryConfiguration;
 import org.whispersystems.bithub.controllers.GithubController;
 import org.whispersystems.bithub.controllers.StatusController;
 import org.whispersystems.bithub.filters.CorsHeaderFilter;
@@ -51,14 +52,14 @@ public class BithubService extends Service<BithubServerConfiguration> {
   public void run(BithubServerConfiguration config, Environment environment)
       throws Exception
   {
-    String         githubUser         = config.getGithubConfiguration().getUser();
-    String         githubToken        = config.getGithubConfiguration().getToken();
-    String         githubWebhookUser  = config.getGithubConfiguration().getWebhookConfiguration().getUsername();
-    String         githubWebhookPwd   = config.getGithubConfiguration().getWebhookConfiguration().getPassword();
-    List<String>   githubRepositories = config.getGithubConfiguration().getRepositories();
-    BigDecimal     payoutRate         = config.getBithubConfiguration().getPayoutRate();
-    GithubClient   githubClient       = new GithubClient(githubUser, githubToken);
-    CoinbaseClient coinbaseClient     = new CoinbaseClient(config.getCoinbaseConfiguration().getApiKey());
+    String                        githubUser         = config.getGithubConfiguration().getUser();
+    String                        githubToken        = config.getGithubConfiguration().getToken();
+    String                        githubWebhookUser  = config.getGithubConfiguration().getWebhookConfiguration().getUsername();
+    String                        githubWebhookPwd   = config.getGithubConfiguration().getWebhookConfiguration().getPassword();
+    List<RepositoryConfiguration> githubRepositories = config.getGithubConfiguration().getRepositories();
+    BigDecimal                    payoutRate         = config.getBithubConfiguration().getPayoutRate();
+    GithubClient                  githubClient       = new GithubClient(githubUser, githubToken);
+    CoinbaseClient                coinbaseClient     = new CoinbaseClient(config.getCoinbaseConfiguration().getApiKey());
 
     environment.addFilter(new CorsHeaderFilter(), "/v1/status/*");
     environment.addResource(new GithubController(githubRepositories, githubClient, coinbaseClient, payoutRate));

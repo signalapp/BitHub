@@ -28,6 +28,7 @@ import org.whispersystems.bithub.auth.GithubWebhookAuthenticator.Authentication;
 import org.whispersystems.bithub.client.CoinbaseClient;
 import org.whispersystems.bithub.client.GithubClient;
 import org.whispersystems.bithub.client.TransferFailedException;
+import org.whispersystems.bithub.config.RepositoryConfiguration;
 import org.whispersystems.bithub.entities.Commit;
 import org.whispersystems.bithub.entities.PushEvent;
 import org.whispersystems.bithub.entities.Repository;
@@ -44,9 +45,11 @@ import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -63,23 +66,24 @@ public class GithubController {
   private final Logger     logger         = LoggerFactory.getLogger(GithubController.class);
   private final SubnetInfo trustedNetwork = new SubnetUtils(GITHUB_WEBOOK_CIDR).getInfo();
 
-  private final CoinbaseClient coinbaseClient;
-  private final GithubClient   githubClient;
-  private final Set<String>    repositories;
-  private final BigDecimal     payoutRate;
+  private final CoinbaseClient      coinbaseClient;
+  private final GithubClient        githubClient;
+  private final Map<String, String> repositories;
+  private final BigDecimal          payoutRate;
 
-  public GithubController(List<String> repositories,
+  public GithubController(List<RepositoryConfiguration> repositories,
                           GithubClient githubClient,
                           CoinbaseClient coinbaseClient,
                           BigDecimal payoutRate)
   {
     this.coinbaseClient = coinbaseClient;
     this.githubClient   = githubClient;
-    this.repositories   = new HashSet<>();
+    this.repositories   = new HashMap<>();
     this.payoutRate     = payoutRate;
 
-    for (String repository : repositories) {
-      this.repositories.add(repository.toLowerCase());
+    for (RepositoryConfiguration repository : repositories) {
+      this.repositories.put(repository.getUrl().toLowerCase(),
+                            repository.getMode().toUpperCase());
     }
   }
 
@@ -95,12 +99,14 @@ public class GithubController {
     authenticate(clientIp);
     PushEvent event = getEventFromPayload(eventString);
 
-    if (!repositories.contains(event.getRepository().getUrl().toLowerCase())) {
-      throw new UnauthorizedHookException("Not a valid repository: " + event.getRepository().getUrl());
+    if (!repositories.containsKey(event.getRepository().getUrl().toLowerCase())) {
+      throw new UnauthorizedHookException("Not a valid repository: " +
+                                          event.getRepository().getUrl());
     }
 
     Repository   repository   = event.getRepository();
-    List<Commit> commits      = getQualifyingCommits(event);
+    String       defaultMode  = repositories.get(repository.getUrl().toLowerCase());
+    List<Commit> commits      = getQualifyingCommits(event, defaultMode);
     BigDecimal   balance      = coinbaseClient.getAccountBalance();
     BigDecimal   exchangeRate = coinbaseClient.getExchangeRate();
 
@@ -141,7 +147,7 @@ public class GithubController {
     return event;
   }
 
-  private List<Commit> getQualifyingCommits(PushEvent event) {
+  private List<Commit> getQualifyingCommits(PushEvent event, String defaultMode) {
     List<Commit> commits = new LinkedList<>();
     Set<String>  emails  = new HashSet<>();
 
@@ -149,7 +155,7 @@ public class GithubController {
       logger.info(commit.getUrl());
       if (!emails.contains(commit.getAuthor().getEmail())) {
         logger.info("Unique author: "+ commit.getAuthor().getEmail());
-        if (commit.getMessage() == null || (!commit.getMessage().startsWith("Merge") && !commit.getMessage().contains("FREEBIE"))) {
+        if (isViableMessage(commit.getMessage(), defaultMode)) {
           logger.info("Not a merge commit or freebie...");
 
           emails.add(commit.getAuthor().getEmail());
@@ -159,6 +165,14 @@ public class GithubController {
     }
 
     return commits;
+  }
+
+  private boolean isViableMessage(String message, String defaultMode) {
+    if (message == null || message.startsWith("Merge"))
+      return false;
+
+    return (!message.contains("FREEBIE") && defaultMode.equals("MONEYMONEY")) ||
+           (message.contains("MONEYMONEY") && defaultMode.equals("FREEBIE"));
   }
 
   private boolean isViablePaymentAmount(BigDecimal payment) {

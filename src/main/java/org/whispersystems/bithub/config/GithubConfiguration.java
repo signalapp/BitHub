@@ -43,7 +43,7 @@ public class GithubConfiguration {
   private String token;
 
   @JsonProperty
-  private List<String> repositories;
+  private List<RepositoryConfiguration> repositories;
 
   @JsonProperty
   private String repositories_heroku;
@@ -61,7 +61,7 @@ public class GithubConfiguration {
     return token;
   }
 
-  public List<String> getRepositories() {
+  public List<RepositoryConfiguration> getRepositories() {
     if (repositories != null) {
       return repositories;
     }
@@ -69,7 +69,7 @@ public class GithubConfiguration {
     if (repositories_heroku != null) {
       try {
         ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(repositories_heroku, new TypeReference<List<String>>() {});
+        return mapper.readValue(repositories_heroku, new TypeReference<List<RepositoryConfiguration>>() {});
       } catch (IOException e) {
         logger.warn("Error deserializing", e);
       }

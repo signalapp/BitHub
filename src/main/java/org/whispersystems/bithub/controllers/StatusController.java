@@ -26,6 +26,7 @@ import org.whispersystems.bithub.entities.Transaction;
 import org.whispersystems.bithub.util.Badge;
 import org.whispersystems.bithub.views.RecentTransactionsView;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -69,14 +70,11 @@ public class StatusController {
   @Timed
   @GET
   @Path("/transactions")
-  public Response getTransactions(@QueryParam("format") @DefaultValue("html") String format)
+  @Consumes({MediaType.APPLICATION_JSON, MediaType.TEXT_HTML})
+  public RecentTransactionsView getTransactions()
       throws IOException
   {
-    if (format.equals("json")) {
-      return Response.ok(cachedTransactions.get(), MediaType.APPLICATION_JSON_TYPE).build();
-    } else {
-      return Response.ok(cachedTransactions.get(), MediaType.TEXT_HTML_TYPE).build();
-    }
+    return cachedTransactions.get();
   }
 
   @Timed

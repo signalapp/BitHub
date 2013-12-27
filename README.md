@@ -35,7 +35,8 @@ Deploying To Heroku
 $ heroku create your_app_name
 $ heroku config:set GITHUB_USER=your_bithub_username
 $ heroku config:set GITHUB_TOKEN=your_bithub_authtoken
-$ heroku config:set GITHUB_REPOSITORIES="[\"https://github.com/youraccount/yourrepo\", \"https://github.com/youraccount/yourotherrepo\"]"
+$ heroku config:set GITHUB_WEBHOOK_PASSWORD=your_webhook_password
+$ heroku config:set GITHUB_REPOSITORIES="[{\"url\" : \"https://github.com/youraccount/yourrepo\"}, {\"url\" : \"https://github.com/youraccount/yourotherrepo\"}]"
 $ heroku config:set COINBASE_API_KEY=your_api_key
 $ git remote add your_heroku_remote
 $ git push heroku master
