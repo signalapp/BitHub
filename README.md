@@ -55,3 +55,6 @@ Current BitHub Payment For Commit:
 =================
 ![Current Price](https://bithub.herokuapp.com/v1/status/payment/commit)
 
+The Bitcoin value paid for each commit is defined as a percentage, currently 2%, of the overall available Bitcoin pool.
+
+Defined in the BithubConfiguration.java file as String payout = "0.02";
