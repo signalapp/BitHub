@@ -19,6 +19,7 @@ package org.whispersystems.bithub;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.yammer.dropwizard.config.Configuration;
+import com.yammer.dropwizard.config.HttpConfiguration;
 import org.whispersystems.bithub.config.BithubConfiguration;
 import org.whispersystems.bithub.config.CoinbaseConfiguration;
 import org.whispersystems.bithub.config.GithubConfiguration;
@@ -42,6 +43,17 @@ public class BithubServerConfiguration extends Configuration {
   @Valid
   private BithubConfiguration bithub = new BithubConfiguration();
 
+  // either the service or the static assets can be served from the root path, but not both.
+  // therefore, we move the service to /service/
+  @JsonProperty("http")
+  private HttpConfiguration http = new HttpConfiguration() {
+    @NotNull
+    @JsonProperty
+    private String rootPath = "/service/*";
+
+    @Override
+    public String getRootPath() { return rootPath; }
+  };
 
   public GithubConfiguration getGithubConfiguration() {
     return github;
@@ -55,4 +67,5 @@ public class BithubServerConfiguration extends Configuration {
     return bithub;
   }
 
+  public HttpConfiguration getHttpConfiguration() { return http; }
 }

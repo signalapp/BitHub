@@ -18,6 +18,7 @@
 package org.whispersystems.bithub;
 
 import com.yammer.dropwizard.Service;
+import com.yammer.dropwizard.assets.AssetsBundle;
 import com.yammer.dropwizard.auth.basic.BasicAuthProvider;
 import com.yammer.dropwizard.config.Bootstrap;
 import com.yammer.dropwizard.config.Environment;
@@ -45,6 +46,7 @@ public class BithubService extends Service<BithubServerConfiguration> {
   @Override
   public void initialize(Bootstrap<BithubServerConfiguration> bootstrap) {
     bootstrap.setName("bithub-server");
+    bootstrap.addBundle(new AssetsBundle("/assets/", "/"));
     bootstrap.addBundle(new ViewBundle());
   }
 
