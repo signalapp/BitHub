@@ -27,7 +27,12 @@ public class CoinbaseConfiguration {
   @NotEmpty
   private String apiKey;
 
+  @JsonProperty
+  private String donationDataCode;
+
   public String getApiKey() {
     return apiKey;
   }
+
+  public String getDonationDataCode() { return donationDataCode; }
 }

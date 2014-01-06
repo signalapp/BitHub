@@ -27,6 +27,7 @@ import org.whispersystems.bithub.auth.GithubWebhookAuthenticator;
 import org.whispersystems.bithub.client.CoinbaseClient;
 import org.whispersystems.bithub.client.GithubClient;
 import org.whispersystems.bithub.config.RepositoryConfiguration;
+import org.whispersystems.bithub.controllers.ConfigController;
 import org.whispersystems.bithub.controllers.GithubController;
 import org.whispersystems.bithub.controllers.StatusController;
 import org.whispersystems.bithub.filters.CorsHeaderFilter;
@@ -66,6 +67,7 @@ public class BithubService extends Service<BithubServerConfiguration> {
     environment.addFilter(new CorsHeaderFilter(), "/v1/status/*");
     environment.addResource(new GithubController(githubRepositories, githubClient, coinbaseClient, payoutRate));
     environment.addResource(new StatusController(coinbaseClient, payoutRate));
+    environment.addResource(new ConfigController(config));
     environment.addProvider(new IOExceptionMapper());
     environment.addProvider(new UnauthorizedHookExceptionMapper());
     environment.addProvider(new BasicAuthProvider<>(
