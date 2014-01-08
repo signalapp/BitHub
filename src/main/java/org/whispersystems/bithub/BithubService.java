@@ -31,6 +31,7 @@ import org.whispersystems.bithub.controllers.ConfigController;
 import org.whispersystems.bithub.controllers.GithubController;
 import org.whispersystems.bithub.controllers.StatusController;
 import org.whispersystems.bithub.filters.CorsHeaderFilter;
+import org.whispersystems.bithub.filters.RootPathServiceUrlRewriteFilter;
 import org.whispersystems.bithub.mappers.IOExceptionMapper;
 import org.whispersystems.bithub.mappers.UnauthorizedHookExceptionMapper;
 
@@ -65,6 +66,7 @@ public class BithubService extends Service<BithubServerConfiguration> {
     CoinbaseClient                coinbaseClient     = new CoinbaseClient(config.getCoinbaseConfiguration().getApiKey());
 
     environment.addFilter(new CorsHeaderFilter(), "/v1/status/*");
+    environment.addFilter(new RootPathServiceUrlRewriteFilter(), "/*");
     environment.addResource(new GithubController(githubRepositories, githubClient, coinbaseClient, payoutRate));
     environment.addResource(new StatusController(coinbaseClient, payoutRate));
     environment.addResource(new ConfigController(config));
