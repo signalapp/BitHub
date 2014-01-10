@@ -183,6 +183,22 @@ public class GithubControllerTest extends ResourceTest {
   }
 
   @Test
+  public void testNonMaster() throws Exception, TransferFailedException {
+    String payloadValue = payload("/payloads/non_master_push.json");
+    MultivaluedMapImpl post = new MultivaluedMapImpl();
+    post.add("payload", payloadValue);
+    ClientResponse response = client().resource("/v1/github/commits/")
+        .header("X-Forwarded-For", "192.30.252.1")
+        .header("Authorization", authString)
+        .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
+        .post(ClientResponse.class, post);
+
+    verify(coinbaseClient, never()).sendPayment(any(Author.class),
+                                       eq(BALANCE.multiply(new BigDecimal(0.02))),
+                                       anyString());
+  }
+
+  @Test
   public void testValidMultipleCommitsMultipleAuthors() throws Exception, TransferFailedException {
     String payloadValue = payload("/payloads/multiple_commits_authors.json");
     MultivaluedMapImpl post = new MultivaluedMapImpl();

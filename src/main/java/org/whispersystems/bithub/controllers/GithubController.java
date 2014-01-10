@@ -62,6 +62,7 @@ import java.util.Set;
 public class GithubController {
 
   private static final String GITHUB_WEBOOK_CIDR = "192.30.252.0/22";
+  private static final String MASTER_REF         = "refs/heads/master";
 
   private final Logger     logger         = LoggerFactory.getLogger(GithubController.class);
   private final SubnetInfo trustedNetwork = new SubnetUtils(GITHUB_WEBOOK_CIDR).getInfo();
@@ -102,6 +103,11 @@ public class GithubController {
     if (!repositories.containsKey(event.getRepository().getUrl().toLowerCase())) {
       throw new UnauthorizedHookException("Not a valid repository: " +
                                           event.getRepository().getUrl());
+    }
+
+    if (!event.getRef().equals(MASTER_REF)) {
+      logger.info("Not a push to master: " + event.getRef());
+      return;
     }
 
     Repository   repository   = event.getRepository();
