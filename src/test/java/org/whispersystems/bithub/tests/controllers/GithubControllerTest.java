@@ -162,6 +162,24 @@ public class GithubControllerTest extends ResourceTest {
         .post(ClientResponse.class, post);
 
     verify(coinbaseClient, never()).sendPayment(any(Author.class),
+                                       anyString(),
+                                       any(BigDecimal.class),
+                                       anyString());
+  }
+
+  @Test
+  public void testCommitSendToLine() throws Exception, TransferFailedException {
+    String payloadValue = payload("/payloads/commit_send_to_line.json");
+    MultivaluedMapImpl post = new MultivaluedMapImpl();
+    post.add("payload", payloadValue);
+    ClientResponse response = client().resource("/v1/github/commits/")
+        .header("X-Forwarded-For", "192.30.252.1")
+        .header("Authorization", authString)
+        .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
+        .post(ClientResponse.class, post);
+
+    verify(coinbaseClient).sendPayment(any(Author.class),
+                                       eq("1PRmBDjTcgjR13FPMQ3m4fLhTxo3s4tCkg"),
                                        any(BigDecimal.class),
                                        anyString());
   }
@@ -178,6 +196,7 @@ public class GithubControllerTest extends ResourceTest {
         .post(ClientResponse.class, post);
 
     verify(coinbaseClient).sendPayment(any(Author.class),
+                                       anyString(),
                                        eq(BALANCE.multiply(new BigDecimal(0.02))),
                                        anyString());
   }
@@ -194,6 +213,7 @@ public class GithubControllerTest extends ResourceTest {
         .post(ClientResponse.class, post);
 
     verify(coinbaseClient, never()).sendPayment(any(Author.class),
+                                       anyString(),
                                        eq(BALANCE.multiply(new BigDecimal(0.02))),
                                        anyString());
   }
@@ -209,9 +229,9 @@ public class GithubControllerTest extends ResourceTest {
         .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
         .post(ClientResponse.class, post);
 
-    verify(coinbaseClient, times(1)).sendPayment(any(Author.class), eq(BALANCE.multiply(new BigDecimal(0.02))),
+    verify(coinbaseClient, times(1)).sendPayment(any(Author.class), anyString(), eq(BALANCE.multiply(new BigDecimal(0.02))),
         anyString());
-    verify(coinbaseClient, times(1)).sendPayment(any(Author.class), eq(BALANCE.subtract(BALANCE.multiply(new BigDecimal(0.02)))
+    verify(coinbaseClient, times(1)).sendPayment(any(Author.class), anyString(), eq(BALANCE.subtract(BALANCE.multiply(new BigDecimal(0.02)))
         .multiply(new BigDecimal(0.02))), anyString());
   }
 
@@ -227,6 +247,7 @@ public class GithubControllerTest extends ResourceTest {
         .post(ClientResponse.class, post);
 
     verify(coinbaseClient).sendPayment(any(Author.class),
+                                       anyString(),
                                        eq(BALANCE.multiply(new BigDecimal(0.02))),
                                        anyString());
   }
@@ -243,6 +264,7 @@ public class GithubControllerTest extends ResourceTest {
         .post(ClientResponse.class, post);
 
     verify(coinbaseClient, never()).sendPayment(any(Author.class),
+                                                anyString(),
                                                 any(BigDecimal.class),
                                                 anyString());
   }

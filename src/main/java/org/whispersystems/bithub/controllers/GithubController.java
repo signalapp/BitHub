@@ -51,6 +51,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Handles incoming API calls from GitHub.  These are currently only
@@ -125,12 +127,19 @@ public class GithubController {
   private void sendPaymentsFor(Repository repository, List<Commit> commits,
                                BigDecimal balance, BigDecimal exchangeRate)
   {
+    Pattern addressPattern = Pattern.compile("^Send-Bitcoin-reward: (.*)$", Pattern.MULTILINE);
+
     for (Commit commit : commits) {
       try {
         BigDecimal payout = balance.multiply(payoutRate);
 
         if (isViablePaymentAmount(payout)) {
-          coinbaseClient.sendPayment(commit.getAuthor(), payout, commit.getUrl());
+          String authorBtcAddress = getHeaderBtcAddress(commit.getMessage(), addressPattern);
+          if (authorBtcAddress != null) {
+            logger.info("Retrieved btc address from commit message: " + authorBtcAddress + ".");
+          }
+          coinbaseClient.sendPayment(commit.getAuthor(), authorBtcAddress, payout,
+                                     commit.getUrl());
         }
 
         balance = balance.subtract(payout);
@@ -179,6 +188,15 @@ public class GithubController {
 
     return (!message.contains("FREEBIE") && defaultMode.equals("MONEYMONEY")) ||
            (message.contains("MONEYMONEY") && defaultMode.equals("FREEBIE"));
+  }
+
+  private String getHeaderBtcAddress(String message, Pattern pattern) {
+          Matcher addressMatcher = pattern.matcher(message);
+          String btcAddress = null;
+          while (addressMatcher.find()) {
+            btcAddress = addressMatcher.group(1);
+          }
+          return btcAddress;
   }
 
   private boolean isViablePaymentAmount(BigDecimal payment) {
