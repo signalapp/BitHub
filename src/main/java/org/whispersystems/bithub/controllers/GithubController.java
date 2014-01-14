@@ -173,6 +173,14 @@ public class GithubController {
     return commits;
   }
 
+  private boolean isHomageCommit(String message, String defaultMode) {
+    if (message == null || message.startsWith("Merge"))
+      return false;
+
+    return (!message.contains("HOMAGETO:") && defaultMode.equals("MONEYMONEY")) ||
+           (message.contains("HOMAGETO:") && defaultMode.equals("FREEBIE"));
+  }
+
   private boolean isViableMessage(String message, String defaultMode) {
     if (message == null || message.startsWith("Merge"))
       return false;
