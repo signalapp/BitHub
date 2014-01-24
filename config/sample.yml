@@ -12,3 +12,4 @@ github:
 
 coinbase:
   apiKey: # Your Coinbase API key.
+  donationDataCode: # See https://coinbase.com/docs/merchant_tools/payment_buttons
