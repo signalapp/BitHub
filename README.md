@@ -20,13 +20,25 @@ Building
     $ cd BitHub
     $ mvn3 package
 
+
+	**Note on Building for Mac Users**
+		1. Make sure to install >= JDK7.0 (http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html)
+		2. Install Maven
+					$ brew install maven
+		3. Next, we must tell maven to use JDK7 or else it will default to system JDK
+					$ nano ~/.mavenrc
+		4. Add this line to .mavenrc file and insert your JDK version
+					$ export JAVA_HOME=/Library/Java/JavaVirtualMachines/{jdk-version}/Contents/Home
+
+
+
 Running
 -----------
 
 1. Create a GitHub account for your BitHub server.
-1. Create a Coinbase account for your BitHub server.
-1. Add the above credentials to `config/sample.yml`
-1. Execute `$ java -jar target/BitHub-0.1.jar server config/yourconfig.yml`
+2. Create a Coinbase account for your BitHub server.
+3. Add the above credentials to `config/sample.yml`
+4. Execute `$ java -jar target/BitHub-0.1.jar server config/yourconfig.yml`
 
 Deploying To Heroku
 ------------
@@ -51,7 +63,7 @@ whispersystems@lists.riseup.net
 
 https://lists.riseup.net/www/info/whispersystems
 
-Current BitHub Payment For Commit: 
+Current BitHub Payment For Commit:
 =================
 ![Current Price](https://bithub.herokuapp.com/v1/status/payment/commit)
 
