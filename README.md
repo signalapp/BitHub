@@ -7,11 +7,24 @@ BitHub is a service that will automatically pay a percentage of Bitcoin funds fo
 
 More information can be found in our [announcement blog post](https://whispersystems.org/blog/bithub).
 
+As a user
+=========
+
+Claiming your share of the bitcoin reward when sending code to projects using BitHub is quite simple: the only thing you need to do is to create
+a [Coinbase](https://coinbase.com) account with the same email address you used to commit your changes.
+
+The project's BitHub server will then query coinbase for a bitcoin address using your commit's email address, and use that to make a payment on
+your Coinbase account.
+
+That's it!
+
 Opting Out
 ----------
 
 If you'd like to opt out of receiving a payment, simply include the string "FREEBIE" somewhere in your commit message, and you will not receive BTC for that commit.
 
+Using BitHub on your projects
+=============================
 
 Building
 -------------
@@ -43,7 +56,7 @@ $ git push heroku master
 ```
 
 Mailing list
-------------
+============
 
 Have a question? Ask on our mailing list!
 
