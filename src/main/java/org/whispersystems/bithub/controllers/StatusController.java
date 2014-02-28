@@ -31,6 +31,7 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -83,12 +84,15 @@ public class StatusController {
   public Response getCurrentCommitPrice(@QueryParam("format") @DefaultValue("png") String format)
       throws IOException
   {
+    CacheControl cacheControl = new CacheControl();
+    cacheControl.setNoCache(true);
+
     if (format.equals("json")) {
-      return Response.ok(cachedPaymentStatus.get().getEntity(), MediaType.APPLICATION_JSON_TYPE).build();
+      return Response.ok(cachedPaymentStatus.get().getEntity(), MediaType.APPLICATION_JSON_TYPE).cacheControl(cacheControl).build();
     } else if (format.equals("png_small")) {
-      return Response.ok(cachedPaymentStatus.get().getSmallBadge(), "image/png").build();
+      return Response.ok(cachedPaymentStatus.get().getSmallBadge(), "image/png").cacheControl(cacheControl).build();
     } else {
-      return Response.ok(cachedPaymentStatus.get().getBadge(), "image/png").build();
+      return Response.ok(cachedPaymentStatus.get().getBadge(), "image/png").cacheControl(cacheControl).build();
     }
   }
 
