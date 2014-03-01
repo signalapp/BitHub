@@ -53,5 +53,5 @@ https://lists.riseup.net/www/info/whispersystems
 
 Current BitHub Payment For Commit: 
 =================
-[![Current Price](https://bithub.herokuapp.com/v1/status/payment/commit)](https://whispersystems.org/blog/bithub/)
+[![Current Price](https://bithub.herokuapp.com/v1/status/payment/commit/)](https://whispersystems.org/blog/bithub/)
 
