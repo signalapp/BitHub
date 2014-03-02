@@ -10,11 +10,13 @@ More information can be found in our [announcement blog post](https://whispersys
 As a user
 =========
 
-Claiming your share of the bitcoin reward when sending code to projects using BitHub is quite simple: the only thing you need to do is to create
-a [Coinbase](https://coinbase.com) account with the same email address you used to commit your changes.
+Claiming your share of the bitcoin reward when sending code to projects using BitHub is quite simple: if a
+[Coinbase](https://coinbase.com) account with the same email address you used to commit your changes exists, it will be credited
+the bitcoin amount automatically. If no such account exists, Coinbase will send you an email message with further instructions
+on how to retrieve your bounty.
 
-The project's BitHub server will then query coinbase for a bitcoin address using your commit's email address, and use that to make a payment on
-your Coinbase account.
+Technically, the project's BitHub server will query the Coinbase API for a bitcoin address using your commit's email address, and
+use that to make a payment on a Coinbase account.
 
 That's it!
 
