@@ -17,34 +17,36 @@
 
 package org.whispersystems.bithub;
 
-import com.yammer.dropwizard.Service;
-import com.yammer.dropwizard.auth.basic.BasicAuthProvider;
-import com.yammer.dropwizard.config.Bootstrap;
-import com.yammer.dropwizard.config.Environment;
-import com.yammer.dropwizard.views.ViewBundle;
+import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.whispersystems.bithub.auth.GithubWebhookAuthenticator;
 import org.whispersystems.bithub.client.CoinbaseClient;
 import org.whispersystems.bithub.client.GithubClient;
 import org.whispersystems.bithub.config.RepositoryConfiguration;
 import org.whispersystems.bithub.controllers.GithubController;
 import org.whispersystems.bithub.controllers.StatusController;
-import org.whispersystems.bithub.filters.CorsHeaderFilter;
 import org.whispersystems.bithub.mappers.IOExceptionMapper;
 import org.whispersystems.bithub.mappers.UnauthorizedHookExceptionMapper;
 
+import javax.servlet.DispatcherType;
 import java.math.BigDecimal;
+import java.util.EnumSet;
 import java.util.List;
+
+import io.dropwizard.Application;
+import io.dropwizard.auth.basic.BasicAuthProvider;
+import io.dropwizard.setup.Bootstrap;
+import io.dropwizard.setup.Environment;
+import io.dropwizard.views.ViewBundle;
 
 /**
  * The main entry point for the service.
  *
  * @author Moxie Marlinspike
  */
-public class BithubService extends Service<BithubServerConfiguration> {
+public class BithubService extends Application<BithubServerConfiguration> {
 
   @Override
   public void initialize(Bootstrap<BithubServerConfiguration> bootstrap) {
-    bootstrap.setName("bithub-server");
     bootstrap.addBundle(new ViewBundle());
   }
 
@@ -61,13 +63,15 @@ public class BithubService extends Service<BithubServerConfiguration> {
     GithubClient                  githubClient       = new GithubClient(githubUser, githubToken);
     CoinbaseClient                coinbaseClient     = new CoinbaseClient(config.getCoinbaseConfiguration().getApiKey());
 
-    environment.addFilter(new CorsHeaderFilter(), "/v1/status/*");
-    environment.addResource(new GithubController(githubRepositories, githubClient, coinbaseClient, payoutRate));
-    environment.addResource(new StatusController(coinbaseClient, payoutRate));
-    environment.addProvider(new IOExceptionMapper());
-    environment.addProvider(new UnauthorizedHookExceptionMapper());
-    environment.addProvider(new BasicAuthProvider<>(
-      new GithubWebhookAuthenticator(githubWebhookUser, githubWebhookPwd), GithubWebhookAuthenticator.REALM));
+    environment.servlets().addFilter("CORS", CrossOriginFilter.class)
+               .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+    
+    environment.jersey().register(new GithubController(githubRepositories, githubClient, coinbaseClient, payoutRate));
+    environment.jersey().register(new StatusController(coinbaseClient, payoutRate));
+    environment.jersey().register(new IOExceptionMapper());
+    environment.jersey().register(new UnauthorizedHookExceptionMapper());
+    environment.jersey().register(new BasicAuthProvider<>(new GithubWebhookAuthenticator(githubWebhookUser, githubWebhookPwd),
+                                                          GithubWebhookAuthenticator.REALM));
   }
 
   public static void main(String[] args) throws Exception {

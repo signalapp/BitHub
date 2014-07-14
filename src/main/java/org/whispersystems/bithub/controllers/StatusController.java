@@ -17,7 +17,7 @@
 
 package org.whispersystems.bithub.controllers;
 
-import com.yammer.metrics.annotation.Timed;
+import com.codahale.metrics.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.whispersystems.bithub.client.CoinbaseClient;
@@ -87,12 +87,13 @@ public class StatusController {
     CacheControl cacheControl = new CacheControl();
     cacheControl.setNoCache(true);
 
-    if (format.equals("json")) {
-      return Response.ok(cachedPaymentStatus.get().getEntity(), MediaType.APPLICATION_JSON_TYPE).cacheControl(cacheControl).build();
-    } else if (format.equals("png_small")) {
-      return Response.ok(cachedPaymentStatus.get().getSmallBadge(), "image/png").cacheControl(cacheControl).build();
-    } else {
-      return Response.ok(cachedPaymentStatus.get().getBadge(), "image/png").cacheControl(cacheControl).build();
+    switch (format) {
+      case "json":
+        return Response.ok(cachedPaymentStatus.get().getEntity(), MediaType.APPLICATION_JSON_TYPE).cacheControl(cacheControl).build();
+      case "png_small":
+        return Response.ok(cachedPaymentStatus.get().getSmallBadge(), "image/png").cacheControl(cacheControl).build();
+      default:
+        return Response.ok(cachedPaymentStatus.get().getBadge(), "image/png").cacheControl(cacheControl).build();
     }
   }
 

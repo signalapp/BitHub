@@ -18,14 +18,14 @@
 package org.whispersystems.bithub;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.yammer.dropwizard.config.Configuration;
 import org.whispersystems.bithub.config.BithubConfiguration;
 import org.whispersystems.bithub.config.CoinbaseConfiguration;
 import org.whispersystems.bithub.config.GithubConfiguration;
-import org.whispersystems.bithub.config.WebhookConfiguration;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+
+import io.dropwizard.Configuration;
 
 public class BithubServerConfiguration extends Configuration {
 

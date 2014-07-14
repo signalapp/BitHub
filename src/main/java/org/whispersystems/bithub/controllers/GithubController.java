@@ -17,9 +17,8 @@
 
 package org.whispersystems.bithub.controllers;
 
+import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yammer.dropwizard.auth.Auth;
-import com.yammer.metrics.annotation.Timed;
 import org.apache.commons.net.util.SubnetUtils;
 import org.apache.commons.net.util.SubnetUtils.SubnetInfo;
 import org.slf4j.Logger;
@@ -51,6 +50,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import io.dropwizard.auth.Auth;
 
 /**
  * Handles incoming API calls from GitHub.  These are currently only

@@ -1,8 +1,9 @@
 package org.whispersystems.bithub.auth;
 
 import com.google.common.base.Optional;
-import com.yammer.dropwizard.auth.Authenticator;
-import com.yammer.dropwizard.auth.basic.BasicCredentials;
+
+import io.dropwizard.auth.Authenticator;
+import io.dropwizard.auth.basic.BasicCredentials;
 
 /**
  * Accepts only one fixed username/password combination.

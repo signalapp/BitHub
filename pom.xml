@@ -11,61 +11,77 @@
     <artifactId>BitHub</artifactId>
     <version>0.1</version>
 
+    <properties>
+        <dropwizard.version>0.7.0</dropwizard.version>
+    </properties>
+
     <dependencies>
         <dependency>
-            <groupId>com.yammer.dropwizard</groupId>
+            <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-core</artifactId>
-            <version>0.6.2</version>
+            <version>${dropwizard.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.yammer.metrics</groupId>
-            <artifactId>metrics-graphite</artifactId>
-            <version>2.2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.yammer.dropwizard</groupId>
+            <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-auth</artifactId>
-            <version>0.6.2</version>
+            <version>${dropwizard.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.yammer.dropwizard</groupId>
+            <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-jdbi</artifactId>
-            <version>0.6.2</version>
+            <version>${dropwizard.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.yammer.dropwizard</groupId>
+            <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-client</artifactId>
-            <version>0.6.2</version>
+            <version>${dropwizard.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.yammer.dropwizard</groupId>
+            <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-migrations</artifactId>
-            <version>0.6.2</version>
+            <version>${dropwizard.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.yammer.dropwizard</groupId>
+            <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-testing</artifactId>
-            <version>0.6.2</version>
+            <version>${dropwizard.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.dropwizard</groupId>
+            <artifactId>dropwizard-metrics-graphite</artifactId>
+            <version>${dropwizard.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard</groupId>
+            <artifactId>dropwizard-views</artifactId>
+            <version>${dropwizard.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard</groupId>
+            <artifactId>dropwizard-servlets</artifactId>
+            <version>${dropwizard.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-json</artifactId>
-            <version>1.17.1</version>
+            <version>1.18.1</version>
         </dependency>
+        <dependency>
+            <groupId>com.codahale.metrics</groupId>
+            <artifactId>metrics-graphite</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+
         <dependency>
             <groupId>com.sun.jersey.contribs</groupId>
             <artifactId>jersey-multipart</artifactId>
-            <version>1.17.1</version>
+            <version>1.18.1</version>
         </dependency>
         <dependency>
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
             <version>3.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.yammer.dropwizard</groupId>
-            <artifactId>dropwizard-views</artifactId>
-            <version>0.6.2</version>
         </dependency>
         <dependency>
             <groupId>org.ocpsoft.prettytime</groupId>

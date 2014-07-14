@@ -19,9 +19,9 @@ package org.whispersystems.bithub.tests.controllers;
 
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
-import com.yammer.dropwizard.auth.basic.BasicAuthProvider;
-import com.yammer.dropwizard.testing.ResourceTest;
 import org.apache.commons.codec.binary.Base64;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.whispersystems.bithub.auth.GithubWebhookAuthenticator;
 import org.whispersystems.bithub.client.CoinbaseClient;
@@ -39,13 +39,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
+import io.dropwizard.auth.basic.BasicAuthProvider;
+import io.dropwizard.testing.junit.ResourceTestRule;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
-public class GithubControllerTest extends ResourceTest {
+public class GithubControllerTest {
 
   private static final BigDecimal BALANCE = new BigDecimal(10.01);
   private static final BigDecimal EXCHANGE_RATE = new BigDecimal(1.0);
@@ -66,13 +68,18 @@ public class GithubControllerTest extends ResourceTest {
     add(new RepositoryConfiguration("https://github.com/moxie0/optin", "FREEBIE"));
   }};
 
-  @Override
-  protected void setUpResources() throws Exception {
+  @Rule
+  public final ResourceTestRule resources = ResourceTestRule.builder()
+                                                            .addProvider(new UnauthorizedHookExceptionMapper())
+                                                            .addProvider(new BasicAuthProvider<>(new GithubWebhookAuthenticator(authUsername, authPassword), authRealm))
+                                                            .addResource(new GithubController(repositories, githubClient, coinbaseClient, new BigDecimal(0.02)))
+                                                            .build();
+
+
+  @Before
+  public void setup() throws Exception {
     when(coinbaseClient.getAccountBalance()).thenReturn(BALANCE);
     when(coinbaseClient.getExchangeRate()).thenReturn(EXCHANGE_RATE);
-    addResource(new GithubController(repositories, githubClient, coinbaseClient, new BigDecimal(0.02)));
-    addProvider(new UnauthorizedHookExceptionMapper());
-    addProvider(new BasicAuthProvider<>(new GithubWebhookAuthenticator(authUsername, authPassword), authRealm));
   }
 
   protected String payload(String path) {
@@ -86,7 +93,7 @@ public class GithubControllerTest extends ResourceTest {
     String payloadValue = payload("/payloads/invalid_repo.json");
     MultivaluedMapImpl post = new MultivaluedMapImpl();
     post.add("payload", payloadValue);
-    ClientResponse response = client().resource("/v1/github/commits/")
+    ClientResponse response = resources.client().resource("/v1/github/commits/")
         .header("X-Forwarded-For", "192.30.252.1")
         .header("Authorization", authString)
         .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
@@ -100,7 +107,7 @@ public class GithubControllerTest extends ResourceTest {
     String payloadValue = payload("/payloads/invalid_origin.json");
     MultivaluedMapImpl post = new MultivaluedMapImpl();
     post.add("payload", payloadValue);
-    ClientResponse response = client().resource("/v1/github/commits/")
+    ClientResponse response = resources.client().resource("/v1/github/commits/")
         .header("X-Forwarded-For", "192.30.242.1")
         .header("Authorization", authString)
         .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
@@ -114,7 +121,7 @@ public class GithubControllerTest extends ResourceTest {
       String payloadValue = payload("/payloads/valid_commit.json");
       MultivaluedMapImpl post = new MultivaluedMapImpl();
       post.add("payload", payloadValue);
-      ClientResponse response = client().resource("/v1/github/commits/")
+      ClientResponse response = resources.client().resource("/v1/github/commits/")
               .header("X-Forwarded-For", "192.30.252.1")
               .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
               .post(ClientResponse.class, post);
@@ -127,7 +134,7 @@ public class GithubControllerTest extends ResourceTest {
       String payloadValue = payload("/payloads/valid_commit.json");
       MultivaluedMapImpl post = new MultivaluedMapImpl();
       post.add("payload", payloadValue);
-      ClientResponse response = client().resource("/v1/github/commits/")
+      ClientResponse response = resources.client().resource("/v1/github/commits/")
               .header("X-Forwarded-For", "192.30.252.1")
               .header("Authorization", invalidUserAuthString)
               .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
@@ -141,7 +148,7 @@ public class GithubControllerTest extends ResourceTest {
       String payloadValue = payload("/payloads/valid_commit.json");
       MultivaluedMapImpl post = new MultivaluedMapImpl();
       post.add("payload", payloadValue);
-      ClientResponse response = client().resource("/v1/github/commits/")
+      ClientResponse response = resources.client().resource("/v1/github/commits/")
               .header("X-Forwarded-For", "192.30.252.1")
               .header("Authorization", invalidPasswordAuthString)
               .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
@@ -155,7 +162,7 @@ public class GithubControllerTest extends ResourceTest {
     String payloadValue = payload("/payloads/opt_out_commit.json");
     MultivaluedMapImpl post = new MultivaluedMapImpl();
     post.add("payload", payloadValue);
-    ClientResponse response = client().resource("/v1/github/commits/")
+    ClientResponse response = resources.client().resource("/v1/github/commits/")
         .header("X-Forwarded-For", "192.30.252.1")
         .header("Authorization", authString)
         .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
@@ -171,7 +178,7 @@ public class GithubControllerTest extends ResourceTest {
     String payloadValue = payload("/payloads/valid_commit.json");
     MultivaluedMapImpl post = new MultivaluedMapImpl();
     post.add("payload", payloadValue);
-    ClientResponse response = client().resource("/v1/github/commits/")
+    ClientResponse response = resources.client().resource("/v1/github/commits/")
         .header("X-Forwarded-For", "192.30.252.1")
         .header("Authorization", authString)
         .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
@@ -187,7 +194,7 @@ public class GithubControllerTest extends ResourceTest {
     String payloadValue = payload("/payloads/non_master_push.json");
     MultivaluedMapImpl post = new MultivaluedMapImpl();
     post.add("payload", payloadValue);
-    ClientResponse response = client().resource("/v1/github/commits/")
+    ClientResponse response = resources.client().resource("/v1/github/commits/")
         .header("X-Forwarded-For", "192.30.252.1")
         .header("Authorization", authString)
         .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
@@ -203,7 +210,7 @@ public class GithubControllerTest extends ResourceTest {
     String payloadValue = payload("/payloads/multiple_commits_authors.json");
     MultivaluedMapImpl post = new MultivaluedMapImpl();
     post.add("payload", payloadValue);
-    ClientResponse response = client().resource("/v1/github/commits/")
+    ClientResponse response = resources.client().resource("/v1/github/commits/")
         .header("X-Forwarded-For", "192.30.252.1")
         .header("Authorization", authString)
         .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
@@ -220,7 +227,7 @@ public class GithubControllerTest extends ResourceTest {
     String payloadValue = payload("/payloads/opt_in_commit.json");
     MultivaluedMapImpl post = new MultivaluedMapImpl();
     post.add("payload", payloadValue);
-    ClientResponse response = client().resource("/v1/github/commits/")
+    ClientResponse response = resources.client().resource("/v1/github/commits/")
         .header("X-Forwarded-For", "192.30.252.1")
         .header("Authorization", authString)
         .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
@@ -236,7 +243,7 @@ public class GithubControllerTest extends ResourceTest {
     String payloadValue = payload("/payloads/no_opt_in_commit.json");
     MultivaluedMapImpl post = new MultivaluedMapImpl();
     post.add("payload", payloadValue);
-    ClientResponse response = client().resource("/v1/github/commits/")
+    ClientResponse response = resources.client().resource("/v1/github/commits/")
         .header("X-Forwarded-For", "192.30.252.1")
         .header("Authorization", authString)
         .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
