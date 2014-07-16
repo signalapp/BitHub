@@ -23,12 +23,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.validation.constraints.NotNull;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TransactionWrapper {
+public class CoinbaseTransactionWrapper {
   @JsonProperty
   @NotNull
-  private Transaction transaction;
+  private CoinbaseTransaction transaction;
 
-  public Transaction getTransaction() {
+  public CoinbaseTransaction getTransaction() {
     return transaction;
   }
 }

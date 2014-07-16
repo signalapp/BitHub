@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>BitHub :: Dashboard </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <style type="text/css">
+        body {
+            padding-top: 20px;
+        }
+
+        pre {
+            white-space: pre-wrap;       /* css-3 */
+            white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+            white-space: -pre-wrap;      /* Opera 4-6 */
+            white-space: -o-pre-wrap;    /* Opera 7 */
+            word-wrap: break-word;       /* Internet Explorer 5.5+ */
+
+            padding: 0px;
+            border: 0px;
+            background-color: transparent;
+            font-family: monospace;
+        }
+
+         /* top tags */
+
+        .hero-widget { text-align: center; padding-top: 20px; padding-bottom: 20px; }
+        .hero-widget .icon { display: block; font-size: 96px; line-height: 96px; margin-bottom: 10px; text-align: center; }
+        .hero-widget var { display: block; height: 64px; font-size: 64px; line-height: 64px; font-style: normal; }
+        .hero-widget label { font-size: 17px; }
+        .hero-widget .options { margin-top: 10px; }
+
+         /* repositories */
+
+        .repository {
+            margin-top: 20px;
+            padding: 40px 0px 20px 0px;
+            background-color: #f7f7f7;
+            -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+            -webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+            box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .repository-name {
+            font-size: 50px;
+            padding: 15px;
+        }
+
+        .repository-name a {
+            text-decoration: none;
+        }
+
+        .repository-description {
+            font-size: 20px;
+            padding: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-3">
+            <h1>BitHub</h1>
+            <p class="lead">{{organizationName}}</p>
+            <p><a class="btn btn-lg btn-success" href="{{donationUrl}}" role="button">Donate BTC today</a></p>
+        </div>
+        <div class="col-sm-3">
+            <div class="hero-widget well well-sm">
+                <div class="icon">
+                    <i class="glyphicon glyphicon-usd"></i>
+                </div>
+                <div class="text">
+                    <var>{{payment}}</var>
+                    <label class="text-muted">USD per commit</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="hero-widget well well-sm">
+                <div class="icon">
+                    <i class="glyphicon glyphicon-tags"></i>
+                </div>
+                <div class="text">
+                    <var>0</var>
+                    <label class="text-muted">open bounties</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="hero-widget well well-sm">
+                <div class="icon">
+                    <i class="glyphicon glyphicon-book"></i>
+                </div>
+                <div class="text">
+                    <var>{{repositoriesCount}}</var>
+                    <label class="text-muted">repositories</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="sub-header">Recent payments</h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>USD</th>
+                <th>Author</th>
+                <th>Description</th>
+                <th>Commit</th>
+            </tr>
+            </thead>
+            <tbody id="transactions_target">
+                {{#transactions}}
+                <tr>
+                    <td>${{amount}} USD</td>
+                    <td><a href="https://github.com/{{destination}}">{{destination}}</a></td>
+                    <td><pre>{{description}}</pre></td>
+                    <td><a href="{{commitUrl}}">{{commitSha}}</a></td>
+                </tr>
+                {{/transactions}}
+            </tbody>
+        </table>
+    </div>
+
+    <h2 class="sub-header">Repositories</h2>
+        <div class="row">
+            {{#repositories}}
+            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                <div class="repository">
+                    <div class="repository-name">
+                        <a href="{{url}}">{{name}}</a>
+                    </div>
+                    <div class="repository-description">
+                        <p>{{description}}</p>
+                    </div>
+                </div>
+            </div>
+            {{/repositories}}
+        </div>
+</div>
+</body>
+</html>

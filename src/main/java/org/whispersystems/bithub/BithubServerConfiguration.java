@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.whispersystems.bithub.config.BithubConfiguration;
 import org.whispersystems.bithub.config.CoinbaseConfiguration;
 import org.whispersystems.bithub.config.GithubConfiguration;
+import org.whispersystems.bithub.config.OrganizationConfiguration;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -43,6 +44,11 @@ public class BithubServerConfiguration extends Configuration {
   @Valid
   private BithubConfiguration bithub = new BithubConfiguration();
 
+  @Valid
+  @NotNull
+  @JsonProperty
+  private OrganizationConfiguration organization;
+
 
   public GithubConfiguration getGithubConfiguration() {
     return github;
@@ -56,4 +62,7 @@ public class BithubServerConfiguration extends Configuration {
     return bithub;
   }
 
+  public OrganizationConfiguration getOrganizationConfiguration() {
+    return organization;
+  }
 }

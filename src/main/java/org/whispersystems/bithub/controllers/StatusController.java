@@ -20,28 +20,27 @@ package org.whispersystems.bithub.controllers;
 import com.codahale.metrics.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.whispersystems.bithub.client.CoinbaseClient;
-import org.whispersystems.bithub.entities.Payment;
+import org.whispersystems.bithub.config.RepositoryConfiguration;
+import org.whispersystems.bithub.entities.Repositories;
+import org.whispersystems.bithub.entities.Repository;
 import org.whispersystems.bithub.entities.Transaction;
-import org.whispersystems.bithub.util.Badge;
-import org.whispersystems.bithub.views.RecentTransactionsView;
+import org.whispersystems.bithub.entities.Transactions;
+import org.whispersystems.bithub.storage.CacheManager;
+import org.whispersystems.bithub.storage.CurrentPayment;
+import org.whispersystems.bithub.views.TransactionsView;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
+
+import io.dropwizard.jersey.caching.CacheControl;
 
 /**
  * Handles incoming API calls for BitHub instance status information.
@@ -51,123 +50,65 @@ import java.util.concurrent.atomic.AtomicReference;
 @Path("/v1/status")
 public class StatusController {
 
-  private static final int UPDATE_FREQUENCY_MILLIS = 60 * 1000;
+  private final Logger logger = LoggerFactory.getLogger(StatusController.class);
 
-  private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
-  private final Logger                   logger   = LoggerFactory.getLogger(StatusController.class);
+  private final List<RepositoryConfiguration> repositoryConfiguration;
+  private final CacheManager coinbaseManager;
 
-  private final AtomicReference<CurrentPayment>         cachedPaymentStatus;
-  private final AtomicReference<RecentTransactionsView> cachedTransactions;
-  private final BigDecimal                              payoutRate;
-
-  public StatusController(CoinbaseClient coinbaseClient, BigDecimal payoutRate) throws IOException {
-    this.payoutRate          = payoutRate;
-    this.cachedPaymentStatus = new AtomicReference<>(createCurrentPaymentForBalance(coinbaseClient));
-    this.cachedTransactions  = new AtomicReference<>(createRecentTransactionsView(coinbaseClient));
-
-    initializeUpdates(coinbaseClient);
+  public StatusController(CacheManager coinbaseManager,
+                          List<RepositoryConfiguration> repositoryConfiguration)
+      throws IOException
+  {
+    this.coinbaseManager         = coinbaseManager;
+    this.repositoryConfiguration = repositoryConfiguration;
   }
 
   @Timed
   @GET
   @Path("/transactions")
-  @Consumes({MediaType.APPLICATION_JSON, MediaType.TEXT_HTML})
-  public RecentTransactionsView getTransactions()
-      throws IOException
+  public Response getTransactions(@QueryParam("format") @DefaultValue("html") String format)
+        throws IOException
   {
-    return cachedTransactions.get();
+    List<Transaction> recentTransactions = coinbaseManager.getRecentTransactions();
+
+    switch (format) {
+      case "html": return Response.ok(new TransactionsView(recentTransactions), MediaType.TEXT_HTML_TYPE).build();
+      case "json":
+      default:     return Response.ok(new Transactions(recentTransactions), MediaType.APPLICATION_JSON_TYPE).build();
+    }
   }
 
   @Timed
   @GET
+  @Path("/repositories")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Repositories getRepositories() {
+    List<Repository> repositories = new LinkedList<>();
+
+    for (RepositoryConfiguration configuration : repositoryConfiguration) {
+      repositories.add(new Repository(configuration.getUrl()));
+    }
+
+    return new Repositories(repositories);
+  }
+
+
+  @Timed
+  @GET
   @Path("/payment/commit")
+  @CacheControl(noCache = true)
   public Response getCurrentCommitPrice(@QueryParam("format") @DefaultValue("png") String format)
       throws IOException
   {
-    CacheControl cacheControl = new CacheControl();
-    cacheControl.setNoCache(true);
+    CurrentPayment currentPayment = coinbaseManager.getCurrentPaymentAmount();
 
     switch (format) {
       case "json":
-        return Response.ok(cachedPaymentStatus.get().getEntity(), MediaType.APPLICATION_JSON_TYPE).cacheControl(cacheControl).build();
+        return Response.ok(currentPayment.getEntity(), MediaType.APPLICATION_JSON_TYPE).build();
       case "png_small":
-        return Response.ok(cachedPaymentStatus.get().getSmallBadge(), "image/png").cacheControl(cacheControl).build();
+        return Response.ok(currentPayment.getSmallBadge(), "image/png").build();
       default:
-        return Response.ok(cachedPaymentStatus.get().getBadge(), "image/png").cacheControl(cacheControl).build();
+        return Response.ok(currentPayment.getBadge(), "image/png").build();
     }
   }
-
-  private CurrentPayment createCurrentPaymentForBalance(CoinbaseClient coinbaseClient)
-      throws IOException
-  {
-    BigDecimal currentBalance = coinbaseClient.getAccountBalance();
-    BigDecimal paymentBtc     = currentBalance.multiply(payoutRate);
-    BigDecimal exchangeRate   = coinbaseClient.getExchangeRate();
-    BigDecimal paymentUsd     = paymentBtc.multiply(exchangeRate);
-
-    paymentUsd = paymentUsd.setScale(2, RoundingMode.CEILING);
-    return new CurrentPayment(Badge.createFor(paymentUsd.toPlainString()),
-                              Badge.createSmallFor(paymentUsd.toPlainString()),
-                              new Payment(paymentUsd.toPlainString()));
-  }
-
-  private RecentTransactionsView createRecentTransactionsView(CoinbaseClient coinbaseClient)
-      throws IOException
-  {
-    List<Transaction> recentTransactions = coinbaseClient.getRecentTransactions();
-    BigDecimal        exchangeRate       = coinbaseClient.getExchangeRate();
-
-    return new RecentTransactionsView(recentTransactions, exchangeRate);
-  }
-
-  public void initializeUpdates(final CoinbaseClient coinbaseClient) {
-    executor.scheduleAtFixedRate(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          CurrentPayment currentPayment = createCurrentPaymentForBalance(coinbaseClient);
-          cachedPaymentStatus.set(currentPayment);
-        } catch (IOException e) {
-          logger.warn("Failed to update badge", e);
-        }
-      }
-    }, UPDATE_FREQUENCY_MILLIS, UPDATE_FREQUENCY_MILLIS, TimeUnit.MILLISECONDS);
-
-    executor.scheduleAtFixedRate(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          RecentTransactionsView view = createRecentTransactionsView(coinbaseClient);
-          cachedTransactions.set(view);
-        } catch (IOException e) {
-          logger.warn("Failed to update recent transactions", e);
-        }
-      }
-    }, UPDATE_FREQUENCY_MILLIS, UPDATE_FREQUENCY_MILLIS, TimeUnit.MILLISECONDS);
-  }
-
-  private class CurrentPayment {
-    private final byte[]  badge;
-    private final byte[]  smallBadge;
-    private final Payment entity;
-
-    private CurrentPayment(byte[] badge, byte[] smallBadge, Payment entity) {
-      this.badge      = badge;
-      this.smallBadge = smallBadge;
-      this.entity     = entity;
-    }
-
-    private byte[] getBadge() {
-      return badge;
-    }
-
-    private byte[] getSmallBadge() {
-      return smallBadge;
-    }
-
-    private Payment getEntity() {
-      return entity;
-    }
-  }
-
 }

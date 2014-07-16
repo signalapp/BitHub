@@ -17,17 +17,27 @@
 
 package org.whispersystems.bithub.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Payment {
+import javax.validation.constraints.NotNull;
+import java.util.LinkedList;
+import java.util.List;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class CoinbseRecentTransactionsResponse {
+
   @JsonProperty
-  private String payment;
+  @NotNull
+  private List<CoinbaseTransactionWrapper> transactions;
 
-  public Payment(String payment) {
-    this.payment = payment;
-  }
+  public List<CoinbaseTransaction> getTransactions() {
+    List<CoinbaseTransaction> rawTransactions = new LinkedList<CoinbaseTransaction>();
 
-  public String getPayment() {
-    return payment;
+    for (CoinbaseTransactionWrapper transactionWrapper : transactions) {
+      rawTransactions.add(transactionWrapper.getTransaction());
+    }
+
+    return rawTransactions;
   }
 }

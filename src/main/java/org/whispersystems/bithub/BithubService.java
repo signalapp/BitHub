@@ -22,10 +22,12 @@ import org.whispersystems.bithub.auth.GithubWebhookAuthenticator;
 import org.whispersystems.bithub.client.CoinbaseClient;
 import org.whispersystems.bithub.client.GithubClient;
 import org.whispersystems.bithub.config.RepositoryConfiguration;
+import org.whispersystems.bithub.controllers.DashboardController;
 import org.whispersystems.bithub.controllers.GithubController;
 import org.whispersystems.bithub.controllers.StatusController;
 import org.whispersystems.bithub.mappers.IOExceptionMapper;
 import org.whispersystems.bithub.mappers.UnauthorizedHookExceptionMapper;
+import org.whispersystems.bithub.storage.CacheManager;
 
 import javax.servlet.DispatcherType;
 import java.math.BigDecimal;
@@ -60,14 +62,22 @@ public class BithubService extends Application<BithubServerConfiguration> {
     String                        githubWebhookPwd   = config.getGithubConfiguration().getWebhookConfiguration().getPassword();
     List<RepositoryConfiguration> githubRepositories = config.getGithubConfiguration().getRepositories();
     BigDecimal                    payoutRate         = config.getBithubConfiguration().getPayoutRate();
-    GithubClient                  githubClient       = new GithubClient(githubUser, githubToken);
-    CoinbaseClient                coinbaseClient     = new CoinbaseClient(config.getCoinbaseConfiguration().getApiKey());
+    String                        organizationName   = config.getOrganizationConfiguration().getName();
+    String                        donationUrl        = config.getOrganizationConfiguration().getDonationUrl().toExternalForm();
+
+    GithubClient   githubClient   = new GithubClient(githubUser, githubToken);
+    CoinbaseClient coinbaseClient = new CoinbaseClient(config.getCoinbaseConfiguration().getApiKey());
+    CacheManager   cacheManager   = new CacheManager(coinbaseClient, githubClient, githubRepositories, payoutRate);
 
     environment.servlets().addFilter("CORS", CrossOriginFilter.class)
                .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
-    
+
+    environment.lifecycle().manage(cacheManager);
+
     environment.jersey().register(new GithubController(githubRepositories, githubClient, coinbaseClient, payoutRate));
-    environment.jersey().register(new StatusController(coinbaseClient, payoutRate));
+    environment.jersey().register(new StatusController(cacheManager, githubRepositories));
+    environment.jersey().register(new DashboardController(organizationName, donationUrl, cacheManager));
+
     environment.jersey().register(new IOExceptionMapper());
     environment.jersey().register(new UnauthorizedHookExceptionMapper());
     environment.jersey().register(new BasicAuthProvider<>(new GithubWebhookAuthenticator(githubWebhookUser, githubWebhookPwd),

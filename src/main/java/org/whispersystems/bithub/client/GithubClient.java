@@ -42,8 +42,10 @@ import javax.ws.rs.core.MediaType;
  */
 public class GithubClient {
 
-  private static final String GITHUB_URL   = "https://api.github.com/";
-  private static final String COMMENT_PATH = "/repos/%s/%s/commits/%s/comments";
+  private static final String GITHUB_URL      = "https://api.github.com/";
+  private static final String COMMENT_PATH    = "/repos/%s/%s/commits/%s/comments";
+  private static final String COMMIT_PATH     = "/repos/%s/%s/git/commits/%s";
+  private static final String REPOSITORY_PATH = "/repos/%s/%s";
 
   private final Logger logger = LoggerFactory.getLogger(GithubClient.class);
 
@@ -53,6 +55,37 @@ public class GithubClient {
   public GithubClient(String user, String token) {
     this.authorizationHeader = getAuthorizationHeader(user, token);
     this.client              = Client.create(getClientConfig());
+  }
+
+  public String getCommitDescription(String commitUrl) {
+    String[] commitUrlParts = commitUrl.split("/");
+    String   owner          = commitUrlParts[commitUrlParts.length - 4];
+    String   repository     = commitUrlParts[commitUrlParts.length - 3];
+    String   commit         = commitUrlParts[commitUrlParts.length - 1];
+
+    String      path     = String.format(COMMIT_PATH, owner, repository, commit);
+    WebResource resource = client.resource(GITHUB_URL).path(path);
+    Commit      response = resource.type(MediaType.APPLICATION_JSON_TYPE)
+                                   .accept(MediaType.APPLICATION_JSON_TYPE)
+                                   .header("Authorization", authorizationHeader)
+                                   .get(Commit.class);
+
+    return response.getMessage();
+  }
+
+  public Repository getRepository(String url) {
+    String[] urlParts = url.split("/");
+    String   owner    = urlParts[urlParts.length - 2];
+    String   name     = urlParts[urlParts.length - 1];
+
+    String      path     = String.format(REPOSITORY_PATH, owner, name);
+    WebResource resource = client.resource(GITHUB_URL).path(path);
+
+    return resource.type(MediaType.APPLICATION_JSON_TYPE)
+                   .accept(MediaType.APPLICATION_JSON_TYPE)
+                   .header("Authorization", authorizationHeader)
+                   .get(Repository.class);
+
   }
 
   public void addCommitComment(Repository repository, Commit commit, String comment) {

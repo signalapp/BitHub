@@ -19,6 +19,7 @@ package org.whispersystems.bithub.views;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.whispersystems.bithub.entities.CoinbaseTransaction;
 import org.whispersystems.bithub.entities.Transaction;
 
 import java.math.BigDecimal;
@@ -33,34 +34,16 @@ import io.dropwizard.views.View;
  *
  * @author Moxie Marlinspike
  */
-public class RecentTransactionsView extends View {
+public class TransactionsView extends View {
 
-  private final Logger                logger       = LoggerFactory.getLogger(RecentTransactionsView.class);
-  private final List<TransactionView> transactions = new LinkedList<>();
+  private final List<Transaction> transactions;
 
-  public RecentTransactionsView(List<Transaction> recentTransactions, BigDecimal exchangeRate) {
+  public TransactionsView(List<Transaction> transactions) {
     super("recent_transactions.mustache");
-
-    for (Transaction transaction : recentTransactions) {
-      try {
-        if (isSentTransaction(transaction)) {
-          transactions.add(new TransactionView(exchangeRate,
-                                               transaction.getAmount(),
-                                               transaction.getCreatedTime(),
-                                               transaction.getNotes()));
-        }
-      } catch (ParseException e) {
-        logger.warn("Error parsing: ", e);
-      }
-    }
+    this.transactions = transactions;
   }
 
-  private boolean isSentTransaction(Transaction transaction) {
-    BigDecimal amount = new BigDecimal(transaction.getAmount());
-    return amount.compareTo(new BigDecimal(0.0)) < 0;
-  }
-
-  public List<TransactionView> getTransactions() {
+  public List<Transaction> getTransactions() {
     return transactions;
   }
 }

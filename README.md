@@ -38,6 +38,8 @@ $ heroku config:set GITHUB_TOKEN=your_bithub_authtoken
 $ heroku config:set GITHUB_WEBHOOK_PASSWORD=your_webhook_password
 $ heroku config:set GITHUB_REPOSITORIES="[{\"url\" : \"https://github.com/youraccount/yourrepo\"}, {\"url\" : \"https://github.com/youraccount/yourotherrepo\"}]"
 $ heroku config:set COINBASE_API_KEY=your_api_key
+$ heroku config:set ORGANIZATION_NAME=your_organization_name
+$ heroku config:set DONATION_URL=your_donation_url
 $ git remote add your_heroku_remote
 $ git push heroku master
 ```

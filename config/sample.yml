@@ -1,8 +1,14 @@
+organization:
+  name: # Your name (eg. Open Whisper Systems)
+  donationUrl: # A Coinbase link where you can receive donations (eg. https://coinbase.com/checkouts/d29fd4c37ca442393e32fdcb95304701)
+
 github:
   user: # Your BitHub instance's GitHub username.
   token: # Your BitHub instance's GitHub auth token.
+
   webhook:
     password: # HTTP basic auth. The username defaults to "bithub".
+
   repositories: # A list of repository URLs to support payouts for.
     - url: # A repository's URL
       mode: # Either MONEYMONEY (default) or FREEBIE.

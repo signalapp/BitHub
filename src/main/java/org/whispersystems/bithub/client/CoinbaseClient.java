@@ -30,8 +30,8 @@ import org.whispersystems.bithub.entities.BalanceResponse;
 import org.whispersystems.bithub.entities.BitcoinTransaction;
 import org.whispersystems.bithub.entities.BitcoinTransactionResponse;
 import org.whispersystems.bithub.entities.ExchangeRate;
-import org.whispersystems.bithub.entities.RecentTransactionsResponse;
-import org.whispersystems.bithub.entities.Transaction;
+import org.whispersystems.bithub.entities.CoinbseRecentTransactionsResponse;
+import org.whispersystems.bithub.entities.CoinbaseTransaction;
 
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
@@ -59,12 +59,12 @@ public class CoinbaseClient {
     this.client = Client.create(getClientConfig());
   }
 
-  public List<Transaction> getRecentTransactions() throws IOException {
+  public List<CoinbaseTransaction> getRecentTransactions() throws IOException {
     try {
       return client.resource(COINBASE_URL)
                    .path(RECENT_TRANSACTIONS_PATH)
                    .queryParam("api_key", apiKey)
-                   .get(RecentTransactionsResponse.class).getTransactions();
+                   .get(CoinbseRecentTransactionsResponse.class).getTransactions();
     } catch (UniformInterfaceException | ClientHandlerException e) {
       throw new IOException(e);
     }

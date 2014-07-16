@@ -38,6 +38,15 @@ public class Repository {
   @NotEmpty
   private String name;
 
+  @JsonProperty
+  private String description;
+
+  public Repository() {}
+
+  public Repository(String url) {
+    this.url = url;
+  }
+
   public Author getOwner() {
     return owner;
   }
@@ -48,5 +57,9 @@ public class Repository {
 
   public String getUrl() {
     return url;
+  }
+
+  public String getDescription() {
+    return description;
   }
 }

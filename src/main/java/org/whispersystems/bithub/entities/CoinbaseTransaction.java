@@ -19,25 +19,47 @@ package org.whispersystems.bithub.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
-import java.util.LinkedList;
-import java.util.List;
+import java.math.BigDecimal;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RecentTransactionsResponse {
+public class CoinbaseTransaction {
+
+  @JsonProperty(value = "created_at")
+  @NotEmpty
+  private String createdTime;
 
   @JsonProperty
   @NotNull
-  private List<TransactionWrapper> transactions;
+  private Amount amount;
 
-  public List<Transaction> getTransactions() {
-    List<Transaction> rawTransactions = new LinkedList<Transaction>();
+  @JsonProperty(value = "recipient_address")
+  private String recipientAddress;
 
-    for (TransactionWrapper transactionWrapper : transactions) {
-      rawTransactions.add(transactionWrapper.getTransaction());
-    }
+  @JsonProperty
+  private String notes;
 
-    return rawTransactions;
+  public String getCreatedTime() {
+    return createdTime;
   }
+
+  public String getAmount() {
+    return amount.getAmount();
+  }
+
+  public String getRecipientAddress() {
+    return recipientAddress;
+  }
+
+  public String getNotes() {
+    return notes;
+  }
+
+  public boolean isSentTransaction() {
+    BigDecimal amount = new BigDecimal(getAmount());
+    return amount.compareTo(new BigDecimal(0.0)) < 0;
+  }
+
 }
