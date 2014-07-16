@@ -85,7 +85,7 @@ public class CoinbaseClient {
   }
 }
 
-  public void sendPayment(Author author, BigDecimal amount, String url)
+  public void sendPayment(Author author, String overwritingBtcAddress, BigDecimal amount, String url)
       throws TransferFailedException
   {
     try {
@@ -95,7 +95,12 @@ public class CoinbaseClient {
 
       String note = "Commit payment:\n__" + author.getUsername() + "__ " + url;
 
-      BitcoinTransaction transaction = new BitcoinTransaction(author.getEmail(),
+      String recipient = author.getEmail();
+      if (overwritingBtcAddress != null && overwritingBtcAddress != "") {
+        recipient = overwritingBtcAddress;
+      }
+
+      BitcoinTransaction transaction = new BitcoinTransaction(recipient,
                                                               amount.toPlainString(),
                                                               note);
 

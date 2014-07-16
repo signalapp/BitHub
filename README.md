@@ -12,6 +12,22 @@ Opting Out
 
 If you'd like to opt out of receiving a payment, simply include the string "FREEBIE" somewhere in your commit message, and you will not receive BTC for that commit.
 
+Payment processing
+------------------
+
+By default, you need a coinbase account for recieving payment. However, if you add a `Send-bitcoin-reward: `-line to your commit, you recieve payment to that address instead.
+You may consider adding a git hook that appends this line for you:
+
+    $ git config --global user.reward-btc "your-btc-address"
+    $ cat > .git/hooks/commit-msg << "EOF"
+    #!/bin/sh
+    VAR=$(git config -z user.reward-btc)
+    if [ -n "$VAR" ]; then
+        awk "/Signed-off-by:.*/ && c == 0 {c = 1; print \"Send-bitcoin-reward: $VAR\"}; {print} END{if(c == 0) {print \"Send-bitcoin-reward: $VAR\"}}" $1 > "$1".tmp
+        mv "$1".tmp $1
+    fi
+    EOF
+    $ chmod +x .git/hooks/commit-msg
 
 Building
 -------------
