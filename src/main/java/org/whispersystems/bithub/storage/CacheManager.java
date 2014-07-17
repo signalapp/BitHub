@@ -84,6 +84,7 @@ public class CacheManager implements Managed {
     executor.scheduleAtFixedRate(new Runnable() {
       @Override
       public void run() {
+        logger.warn("Running cache update...");
         try {
           CurrentPayment    currentPayment = createCurrentPaymentForBalance(coinbaseClient);
           List<Transaction> transactions   = createRecentTransactions      (coinbaseClient);
