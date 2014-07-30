@@ -28,6 +28,7 @@ public class StatusControllerTest {
   private static final BigDecimal PAYOUT_RATE   = new BigDecimal(0.02 );
   private static final BigDecimal BALANCE       = new BigDecimal(10.01);
   private static final BigDecimal EXCHANGE_RATE = new BigDecimal(1.0  );
+  private static final int        BTC_PRECISION = 4;
 
   private static final CoinbaseClient coinbaseClient = mock(CoinbaseClient.class);
   private static final GithubClient   githubClient   = mock(GithubClient.class  );
@@ -43,7 +44,8 @@ public class StatusControllerTest {
 
       CacheManager coinbaseManager = new CacheManager(coinbaseClient, githubClient,
                                                       new LinkedList<RepositoryConfiguration>(),
-                                                      PAYOUT_RATE);
+                                                      PAYOUT_RATE,
+                                                      BTC_PRECISION);
       coinbaseManager.start();
 
       resources = ResourceTestRule.builder()
@@ -69,6 +71,7 @@ public class StatusControllerTest {
 //
 //    assertThat(response.getStatus()).isEqualTo(200);
 //    assertThat(response.getType()).isEqualTo(MediaType.TEXT_HTML_TYPE);
+//    assertThat(response.getEntity(String.class)).contains("<li>Sent $1.10 USD (1.1000 BTC)");
 //  }
 
   @Test
@@ -78,6 +81,7 @@ public class StatusControllerTest {
 
     assertThat(response.getStatus()).isEqualTo(200);
     assertThat(response.getType()).isEqualTo(MediaType.APPLICATION_JSON_TYPE);
+    assertThat(response.getEntity(String.class)).contains("\"amount\":\"1.10\",\"amountInBTC\":\"1.1000\"");
   }
 
 }

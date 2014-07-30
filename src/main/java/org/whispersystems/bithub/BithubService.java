@@ -62,12 +62,13 @@ public class BithubService extends Application<BithubServerConfiguration> {
     String                        githubWebhookPwd   = config.getGithubConfiguration().getWebhookConfiguration().getPassword();
     List<RepositoryConfiguration> githubRepositories = config.getGithubConfiguration().getRepositories();
     BigDecimal                    payoutRate         = config.getBithubConfiguration().getPayoutRate();
+    int                           btcPrecision       = config.getBithubConfiguration().getBtcPrecision();
     String                        organizationName   = config.getOrganizationConfiguration().getName();
     String                        donationUrl        = config.getOrganizationConfiguration().getDonationUrl().toExternalForm();
 
     GithubClient   githubClient   = new GithubClient(githubUser, githubToken);
     CoinbaseClient coinbaseClient = new CoinbaseClient(config.getCoinbaseConfiguration().getApiKey());
-    CacheManager   cacheManager   = new CacheManager(coinbaseClient, githubClient, githubRepositories, payoutRate);
+    CacheManager   cacheManager   = new CacheManager(coinbaseClient, githubClient, githubRepositories, payoutRate, btcPrecision);
 
     environment.servlets().addFilter("CORS", CrossOriginFilter.class)
                .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");

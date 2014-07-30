@@ -34,6 +34,7 @@ public class CacheManager implements Managed {
   private final CoinbaseClient                coinbaseClient;
   private final GithubClient                  githubClient;
   private final BigDecimal                    payoutRate;
+  private final int                           btcPrecision;
   private final List<RepositoryConfiguration> repositories;
 
   private AtomicReference<CurrentPayment>    cachedPaymentStatus;
@@ -43,18 +44,20 @@ public class CacheManager implements Managed {
   public CacheManager(CoinbaseClient coinbaseClient,
                       GithubClient githubClient,
                       List<RepositoryConfiguration> repositories,
-                      BigDecimal payoutRate)
+                      BigDecimal payoutRate,
+                      int btcPrecision)
   {
     this.coinbaseClient = coinbaseClient;
     this.githubClient   = githubClient;
     this.payoutRate     = payoutRate;
+    this.btcPrecision   = btcPrecision;
     this.repositories   = repositories;
   }
 
   @Override
   public void start() throws Exception {
     this.cachedPaymentStatus = new AtomicReference<>(createCurrentPaymentForBalance(coinbaseClient));
-    this.cachedTransactions  = new AtomicReference<>(createRecentTransactions(coinbaseClient));
+    this.cachedTransactions  = new AtomicReference<>(createRecentTransactions(coinbaseClient, btcPrecision));
     this.cachedRepositories  = new AtomicReference<>(createRepositories(githubClient, repositories));
 
     initializeUpdates(coinbaseClient, githubClient, repositories);
@@ -86,7 +89,7 @@ public class CacheManager implements Managed {
       public void run() {
         try {
           CurrentPayment    currentPayment = createCurrentPaymentForBalance(coinbaseClient);
-          List<Transaction> transactions   = createRecentTransactions      (coinbaseClient);
+          List<Transaction> transactions   = createRecentTransactions      (coinbaseClient, btcPrecision);
           List<Repository>  repositories   = createRepositories(githubClient, repoConfigs);
 
           cachedPaymentStatus.set(currentPayment);
@@ -126,7 +129,7 @@ public class CacheManager implements Managed {
                               new Payment(paymentUsd.toPlainString()));
   }
 
-  private List<Transaction> createRecentTransactions(CoinbaseClient coinbaseClient)
+  private List<Transaction> createRecentTransactions(CoinbaseClient coinbaseClient, int precision)
       throws IOException
   {
     List<CoinbaseTransaction> recentTransactions = coinbaseClient.getRecentTransactions();
@@ -143,6 +146,7 @@ public class CacheManager implements Managed {
 
           transactions.add(new Transaction(parser.parseDestinationFromMessage(),
                                            parser.parseAmountInDollars(exchangeRate),
+                                           parser.parseAmountInBTC(precision),
                                            url, sha, parser.parseTimestamp(),
                                            description));
 

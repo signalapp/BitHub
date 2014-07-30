@@ -11,6 +11,9 @@ public class Transaction {
   private String amount;
 
   @JsonProperty
+  private String amountInBTC;
+
+  @JsonProperty
   private String commitUrl;
 
   @JsonProperty
@@ -24,11 +27,12 @@ public class Transaction {
 
   public Transaction() {}
 
-  public Transaction(String destination, String amount, String commitUrl,
+  public Transaction(String destination, String amount, String amountInBTC, String commitUrl,
                      String commitSha, String timestamp, String description)
   {
     this.destination = destination;
     this.amount      = amount;
+    this.amountInBTC = amountInBTC;
     this.commitUrl   = commitUrl;
     this.commitSha   = commitSha;
     this.timestamp   = timestamp;
@@ -41,6 +45,10 @@ public class Transaction {
 
   public String getAmount() {
     return amount;
+  }
+
+  public String getAmountInBTC() {
+    return amountInBTC;
   }
 
   public String getCommitUrl() {

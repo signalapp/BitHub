@@ -30,8 +30,18 @@ public class BithubConfiguration {
   @NotEmpty
   private String payout = "0.02";
 
+  // This is the number of decimal places shown when displaying amounts in BTC
+  // Change this if needed to whatever is appropriate for your payout amounts
+  @JsonProperty
+  @NotEmpty
+  private int btcPrecision = 4;
+
   public BigDecimal getPayoutRate() {
     return new BigDecimal(payout);
+  }
+
+  public int getBtcPrecision() {
+    return btcPrecision;
   }
 
 }

@@ -24,6 +24,12 @@ public class CoinbaseTransactionParser {
                                                           .toPlainString();
   }
 
+  public String parseAmountInBTC(int precision) {
+    return new BigDecimal(coinbaseTransaction.getAmount()).abs()
+                                                          .setScale(precision, RoundingMode.CEILING)
+                                                          .toPlainString();
+  }
+
   public String parseTimestamp() throws ParseException {
     String timestamp      = coinbaseTransaction.getCreatedTime();
     int    offendingColon = timestamp.lastIndexOf(':');
