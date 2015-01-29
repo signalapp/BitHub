@@ -18,3 +18,4 @@ github:
 
 coinbase:
   apiKey: # Your Coinbase API key.
+  apiSecret: # Your Coinbase API secret.

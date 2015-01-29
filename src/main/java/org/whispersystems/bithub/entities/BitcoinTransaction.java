@@ -22,13 +22,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class BitcoinTransaction {
 
   @JsonProperty
-  private String to;
+  public String to;
 
   @JsonProperty
-  private String amount;
+  public String amount;
 
   @JsonProperty
-  private String notes;
+  public String notes;
 
   public BitcoinTransaction(String to, String amount, String notes) {
     this.to     = to;
