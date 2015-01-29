@@ -19,12 +19,19 @@ package org.whispersystems.bithub.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.util.List;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BitcoinTransactionResponse {
 
   private boolean success;
+  private List<String> errors;
 
   public boolean isSuccess() {
     return success;
+  }
+
+  public void setErrors(List<String> errors) {
+    this.errors = errors;
   }
 }

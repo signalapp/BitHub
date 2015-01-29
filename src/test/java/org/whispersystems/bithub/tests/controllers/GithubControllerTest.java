@@ -77,7 +77,7 @@ public class GithubControllerTest {
 
 
   @Before
-  public void setup() throws Exception {
+  public void setup() throws Exception, TransferFailedException {
     when(coinbaseClient.getAccountBalance()).thenReturn(BALANCE);
     when(coinbaseClient.getExchangeRate()).thenReturn(EXCHANGE_RATE);
   }

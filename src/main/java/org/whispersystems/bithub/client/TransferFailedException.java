@@ -17,13 +17,13 @@
 
 package org.whispersystems.bithub.client;
 
-public class TransferFailedException extends Throwable {
+public class TransferFailedException extends Exception {
 
   public TransferFailedException() {
     super();
   }
 
-  public TransferFailedException(RuntimeException e) {
+  public TransferFailedException(Throwable e) {
     super(e);
   }
 }

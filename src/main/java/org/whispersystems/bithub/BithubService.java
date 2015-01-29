@@ -21,6 +21,7 @@ import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.whispersystems.bithub.auth.GithubWebhookAuthenticator;
 import org.whispersystems.bithub.client.CoinbaseClient;
 import org.whispersystems.bithub.client.GithubClient;
+import org.whispersystems.bithub.config.CoinbaseConfiguration;
 import org.whispersystems.bithub.config.RepositoryConfiguration;
 import org.whispersystems.bithub.controllers.DashboardController;
 import org.whispersystems.bithub.controllers.GithubController;
@@ -64,9 +65,11 @@ public class BithubService extends Application<BithubServerConfiguration> {
     BigDecimal                    payoutRate         = config.getBithubConfiguration().getPayoutRate();
     String                        organizationName   = config.getOrganizationConfiguration().getName();
     String                        donationUrl        = config.getOrganizationConfiguration().getDonationUrl().toExternalForm();
+    String                        coinbaseApiKey     = config.getCoinbaseConfiguration().getApiKey();
+    String                        coinbaseApiSecret  = config.getCoinbaseConfiguration().getApiSecret();
 
     GithubClient   githubClient   = new GithubClient(githubUser, githubToken);
-    CoinbaseClient coinbaseClient = new CoinbaseClient(config.getCoinbaseConfiguration().getApiKey());
+    CoinbaseClient coinbaseClient = new CoinbaseClient(coinbaseApiKey, coinbaseApiSecret);
     CacheManager   cacheManager   = new CacheManager(coinbaseClient, githubClient, githubRepositories, payoutRate);
 
     environment.servlets().addFilter("CORS", CrossOriginFilter.class)

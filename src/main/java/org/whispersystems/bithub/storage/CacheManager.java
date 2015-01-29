@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.whispersystems.bithub.client.CoinbaseClient;
 import org.whispersystems.bithub.client.GithubClient;
+import org.whispersystems.bithub.client.TransferFailedException;
 import org.whispersystems.bithub.config.RepositoryConfiguration;
 import org.whispersystems.bithub.entities.CoinbaseTransaction;
 import org.whispersystems.bithub.entities.Payment;
@@ -94,7 +95,7 @@ public class CacheManager implements Managed {
           cachedTransactions.set(transactions);
           cachedRepositories.set(repositories);
 
-        } catch (IOException e) {
+        } catch (IOException | TransferFailedException e) {
           logger.warn("Failed to update badge", e);
         }
       }
@@ -114,7 +115,7 @@ public class CacheManager implements Managed {
   }
 
   private CurrentPayment createCurrentPaymentForBalance(CoinbaseClient coinbaseClient)
-      throws IOException
+          throws IOException, TransferFailedException
   {
     BigDecimal currentBalance = coinbaseClient.getAccountBalance();
     BigDecimal paymentBtc     = currentBalance.multiply(payoutRate);
@@ -128,7 +129,7 @@ public class CacheManager implements Managed {
   }
 
   private List<Transaction> createRecentTransactions(CoinbaseClient coinbaseClient)
-      throws IOException
+          throws IOException, TransferFailedException
   {
     List<CoinbaseTransaction> recentTransactions = coinbaseClient.getRecentTransactions();
     BigDecimal                exchangeRate       = coinbaseClient.getExchangeRate();
