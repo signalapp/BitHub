@@ -96,8 +96,7 @@ public class GithubController {
   public void handleCommits(@Auth Authentication auth,
                             @HeaderParam("X-Forwarded-For") String clientIp,
                             @FormParam("payload") String eventString)
-      throws IOException, UnauthorizedHookException
-  {
+          throws IOException, UnauthorizedHookException, TransferFailedException {
     authenticate(clientIp);
     PushEvent event = getEventFromPayload(eventString);
 

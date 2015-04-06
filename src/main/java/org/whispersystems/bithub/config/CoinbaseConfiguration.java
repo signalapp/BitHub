@@ -27,7 +27,15 @@ public class CoinbaseConfiguration {
   @NotEmpty
   private String apiKey;
 
+  @JsonProperty
+  @NotEmpty
+  private String apiSecret;
+
   public String getApiKey() {
     return apiKey;
+  }
+
+  public String getApiSecret() {
+    return apiSecret;
   }
 }

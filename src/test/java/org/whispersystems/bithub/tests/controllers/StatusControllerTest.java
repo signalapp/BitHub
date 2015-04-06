@@ -5,6 +5,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.whispersystems.bithub.client.CoinbaseClient;
 import org.whispersystems.bithub.client.GithubClient;
+import org.whispersystems.bithub.client.TransferFailedException;
 import org.whispersystems.bithub.config.RepositoryConfiguration;
 import org.whispersystems.bithub.controllers.StatusController;
 import org.whispersystems.bithub.entities.CoinbseRecentTransactionsResponse;
@@ -49,7 +50,7 @@ public class StatusControllerTest {
       resources = ResourceTestRule.builder()
                                   .addResource(new StatusController(coinbaseManager, null))
                                   .build();
-    } catch (Exception e) {
+    } catch (Exception | TransferFailedException e) {
       throw new AssertionError(e);
     }
   }
