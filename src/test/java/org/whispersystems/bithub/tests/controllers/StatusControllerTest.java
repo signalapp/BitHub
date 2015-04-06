@@ -5,11 +5,9 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.whispersystems.bithub.client.CoinbaseClient;
 import org.whispersystems.bithub.client.GithubClient;
-import org.whispersystems.bithub.client.TransferFailedException;
 import org.whispersystems.bithub.config.RepositoryConfiguration;
 import org.whispersystems.bithub.controllers.StatusController;
 import org.whispersystems.bithub.entities.CoinbseRecentTransactionsResponse;
-import org.whispersystems.bithub.entities.Repository;
 import org.whispersystems.bithub.storage.CacheManager;
 
 import javax.ws.rs.core.MediaType;
@@ -18,7 +16,6 @@ import java.util.LinkedList;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
 import static org.fest.assertions.api.Assertions.assertThat;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.whispersystems.bithub.tests.util.JsonHelper.fromJson;
@@ -50,7 +47,7 @@ public class StatusControllerTest {
       resources = ResourceTestRule.builder()
                                   .addResource(new StatusController(coinbaseManager, null))
                                   .build();
-    } catch (Exception | TransferFailedException e) {
+    } catch (Exception e) {
       throw new AssertionError(e);
     }
   }
