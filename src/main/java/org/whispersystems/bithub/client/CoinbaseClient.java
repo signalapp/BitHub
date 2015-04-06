@@ -22,11 +22,13 @@ import com.coinbase.api.CoinbaseBuilder;
 import com.coinbase.api.entity.Account;
 import com.coinbase.api.entity.Transaction;
 import com.coinbase.api.exception.CoinbaseException;
+import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.whispersystems.bithub.entities.Author;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 /**
@@ -60,7 +62,7 @@ public class CoinbaseClient {
 
       Transaction transaction = new Transaction();
       transaction.setTo(author.getEmail());
-      transaction.setAmount(Money.parse("BTC " + amount.toPlainString()));
+      transaction.setAmount(Money.of(CurrencyUnit.of("BTC"), amount, RoundingMode.DOWN));
       transaction.setNotes(note);
 
       Transaction response = coinbase.sendMoney(transaction);
