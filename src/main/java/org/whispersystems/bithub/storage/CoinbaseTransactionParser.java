@@ -1,34 +1,34 @@
 package org.whispersystems.bithub.storage;
 
+import com.coinbase.api.entity.Transaction;
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.ocpsoft.prettytime.PrettyTime;
-import org.whispersystems.bithub.entities.CoinbaseTransaction;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 public class CoinbaseTransactionParser {
 
-  private final CoinbaseTransaction coinbaseTransaction;
+  private final Transaction coinbaseTransaction;
 
-  public CoinbaseTransactionParser(CoinbaseTransaction coinbaseTransaction) {
+  public CoinbaseTransactionParser(Transaction coinbaseTransaction) {
     this.coinbaseTransaction = coinbaseTransaction;
   }
 
   public String parseAmountInDollars(BigDecimal exchangeRate) {
-    return new BigDecimal(coinbaseTransaction.getAmount()).abs()
-                                                          .multiply(exchangeRate)
-                                                          .setScale(2, RoundingMode.CEILING)
-                                                          .toPlainString();
+    return coinbaseTransaction.getAmount().getAmount().abs()
+                              .multiply(exchangeRate)
+                              .setScale(2, RoundingMode.CEILING)
+                              .toPlainString();
   }
 
   public String parseTimestamp() throws ParseException {
-    String timestamp      = coinbaseTransaction.getCreatedTime();
-    int    offendingColon = timestamp.lastIndexOf(':');
-    String fixedTimestamp = timestamp.substring(0, offendingColon) + timestamp.substring(offendingColon + 1);
-    return new PrettyTime().format(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").parse(fixedTimestamp));
+    DateTime          timestamp = coinbaseTransaction.getCreatedAt();
+    DateTimeFormatter fmt       = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZ");
+    return fmt.print(timestamp);
   }
 
   public String parseDestinationFromMessage() {

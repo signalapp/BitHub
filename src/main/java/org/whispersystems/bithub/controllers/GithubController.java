@@ -18,6 +18,7 @@
 package org.whispersystems.bithub.controllers;
 
 import com.codahale.metrics.annotation.Timed;
+import com.coinbase.api.exception.CoinbaseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.net.util.SubnetUtils;
 import org.apache.commons.net.util.SubnetUtils.SubnetInfo;
@@ -96,7 +97,7 @@ public class GithubController {
   public void handleCommits(@Auth Authentication auth,
                             @HeaderParam("X-Forwarded-For") String clientIp,
                             @FormParam("payload") String eventString)
-          throws IOException, UnauthorizedHookException, TransferFailedException
+      throws IOException, UnauthorizedHookException, TransferFailedException, CoinbaseException
   {
     authenticate(clientIp);
     PushEvent event = getEventFromPayload(eventString);

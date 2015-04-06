@@ -1,12 +1,11 @@
 package org.whispersystems.bithub.storage;
 
+import com.coinbase.api.exception.CoinbaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.whispersystems.bithub.client.CoinbaseClient;
 import org.whispersystems.bithub.client.GithubClient;
-import org.whispersystems.bithub.client.TransferFailedException;
 import org.whispersystems.bithub.config.RepositoryConfiguration;
-import org.whispersystems.bithub.entities.CoinbaseTransaction;
 import org.whispersystems.bithub.entities.Payment;
 import org.whispersystems.bithub.entities.Repository;
 import org.whispersystems.bithub.entities.Transaction;
@@ -95,7 +94,7 @@ public class CacheManager implements Managed {
           cachedTransactions.set(transactions);
           cachedRepositories.set(repositories);
 
-        } catch (IOException | TransferFailedException e) {
+        } catch (IOException | CoinbaseException e) {
           logger.warn("Failed to update badge", e);
         }
       }
@@ -115,7 +114,7 @@ public class CacheManager implements Managed {
   }
 
   private CurrentPayment createCurrentPaymentForBalance(CoinbaseClient coinbaseClient)
-          throws IOException, TransferFailedException
+      throws IOException, CoinbaseException
   {
     BigDecimal currentBalance = coinbaseClient.getAccountBalance();
     BigDecimal paymentBtc     = currentBalance.multiply(payoutRate);
@@ -129,15 +128,15 @@ public class CacheManager implements Managed {
   }
 
   private List<Transaction> createRecentTransactions(CoinbaseClient coinbaseClient)
-          throws IOException, TransferFailedException
+          throws IOException, CoinbaseException
   {
-    List<CoinbaseTransaction> recentTransactions = coinbaseClient.getRecentTransactions();
-    BigDecimal                exchangeRate       = coinbaseClient.getExchangeRate();
-    List<Transaction>         transactions       = new LinkedList<>();
+    List<com.coinbase.api.entity.Transaction> recentTransactions = coinbaseClient.getRecentTransactions();
+    BigDecimal                                exchangeRate       = coinbaseClient.getExchangeRate();
+    List<Transaction>                         transactions       = new LinkedList<>();
 
-    for (CoinbaseTransaction coinbaseTransaction : recentTransactions) {
+    for (com.coinbase.api.entity.Transaction coinbaseTransaction : recentTransactions) {
       try {
-        if (coinbaseTransaction.isSentTransaction()) {
+        if (isSentTransaction(coinbaseTransaction)) {
           CoinbaseTransactionParser parser      = new CoinbaseTransactionParser(coinbaseTransaction);
           String                    url         = parser.parseUrlFromMessage();
           String                    sha         = parser.parseShaFromUrl(url);
@@ -158,5 +157,11 @@ public class CacheManager implements Managed {
 
     return transactions;
   }
+
+  private boolean isSentTransaction(com.coinbase.api.entity.Transaction coinbaseTransaction) {
+    BigDecimal amount = coinbaseTransaction.getAmount().getAmount();
+    return amount.compareTo(new BigDecimal(0.0)) < 0;
+  }
+
 
 }
