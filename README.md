@@ -16,7 +16,7 @@ If you'd like to opt out of receiving a payment, simply include the string "FREE
 Building
 -------------
 
-```bash
+```sh
 $ git clone https://github.com/WhisperSystems/BitHub.git
 $ cd BitHub
 $ mvn3 package
@@ -33,7 +33,7 @@ Running
 Deploying To Heroku
 ------------
 
-```bash
+```sh
 $ heroku create your_app_name
 $ heroku config:set GITHUB_USER=your_bithub_username
 $ heroku config:set GITHUB_TOKEN=your_bithub_authtoken
