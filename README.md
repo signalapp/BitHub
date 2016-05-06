@@ -3,7 +3,7 @@ BitHub
 
 [![Build Status](https://travis-ci.org/WhisperSystems/BitHub.png?branch=master)](https://travis-ci.org/WhisperSystems/BitHub)
 
-BitHub is a service that will automatically pay a percentage of Bitcoin funds for every submission to a GitHub repository.
+BitHub is a service that will automatically pay a percentage of Bitcoin funds for every submission to a GitHub repository.  This amount can be up to $20!
 
 More information can be found in our [announcement blog post](https://whispersystems.org/blog/bithub).
 
