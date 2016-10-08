@@ -12,6 +12,9 @@ Opting Out
 
 If you'd like to opt out of receiving a payment, simply include the string "FREEBIE" somewhere in your commit message, and you will not receive BTC for that commit.
 
+Receiving Payment
+-----------------
+An email address is pulled from the user's GitHub profile. Bitcoins are sent to the email address using the Coinbase API. The email contains a link to Coinbase's web site, where the bitcoins can be claimed. A Coinbase account is required to claim the bitcoins.
 
 Building
 -------------
