@@ -33,7 +33,7 @@ public class Badge {
     BufferedImage bufferedImage   = ImageIO.read(new ByteArrayInputStream(badgeBackground));
     Graphics2D    graphics        = bufferedImage.createGraphics();
 
-    graphics.setFont(new Font("OpenSans", Font.PLAIN, 34));
+    graphics.setFont(new Font("Open Sans", Font.PLAIN, 34));
     graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
                               RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
     graphics.drawString(price + " USD", 86, 45);
@@ -50,7 +50,7 @@ public class Badge {
     BufferedImage bufferedImage   = ImageIO.read(new ByteArrayInputStream(badgeBackground));
     Graphics2D    graphics        = bufferedImage.createGraphics();
 
-    graphics.setFont(new Font("OpenSans", Font.PLAIN, 9));
+    graphics.setFont(new Font("Open Sans", Font.PLAIN, 9));
     graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
                               RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
     graphics.drawString(price + " USD", 22, 14);
