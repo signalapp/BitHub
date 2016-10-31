@@ -65,6 +65,7 @@ public class GithubController {
 
   private static final String GITHUB_WEBOOK_CIDR = "192.30.252.0/22";
   private static final String MASTER_REF         = "refs/heads/master";
+  private static final String NOREPLY_DOMAIN     = "@users.noreply.github.com";
 
   private final Logger     logger         = LoggerFactory.getLogger(GithubController.class);
   private final SubnetInfo trustedNetwork = new SubnetUtils(GITHUB_WEBOOK_CIDR).getInfo();
@@ -160,13 +161,19 @@ public class GithubController {
     Set<String>  emails  = new HashSet<>();
 
     for (Commit commit : event.getCommits()) {
+      String email = commit.getAuthor().getEmail();
+
       logger.info(commit.getUrl());
-      if (!emails.contains(commit.getAuthor().getEmail())) {
-        logger.info("Unique author: "+ commit.getAuthor().getEmail());
+
+      if (email.endsWith(NOREPLY_DOMAIN)) {
+        logger.info("Skipping GitHub noreply author " + email);
+      } else if (!emails.contains(email)) {
+        logger.info("Unique author: " + email);
+
         if (isViableMessage(commit.getMessage(), defaultMode)) {
           logger.info("Not a merge commit or freebie...");
 
-          emails.add(commit.getAuthor().getEmail());
+          emails.add(email);
           commits.add(commit);
         }
       }
