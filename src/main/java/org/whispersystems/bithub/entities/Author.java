@@ -34,6 +34,9 @@ public class Author {
   @JsonProperty
   private String username;
 
+  @JsonProperty
+  private String homagename;
+
   public String getName() {
     return name;
   }
@@ -45,4 +48,8 @@ public class Author {
   public String getUsername() {
     return username;
   }
+  public String getHomeageName() {
+    return homagename;
+  }
+
 }
