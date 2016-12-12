@@ -31,6 +31,10 @@ public class Repository {
   private String url;
 
   @JsonProperty
+  @NotEmpty
+  private String html_url;
+
+  @JsonProperty
   @NotNull
   private Author owner;
 
@@ -57,6 +61,10 @@ public class Repository {
 
   public String getUrl() {
     return url;
+  }
+
+  public String getHtmlUrl() {
+    return html_url;
   }
 
   public String getDescription() {
