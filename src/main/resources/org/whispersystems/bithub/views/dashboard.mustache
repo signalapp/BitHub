@@ -121,6 +121,7 @@
         <table class="table table-striped">
             <thead>
             <tr>
+                <th>Created at</th>
                 <th>USD</th>
                 <th>Author</th>
                 <th>Description</th>
@@ -130,6 +131,7 @@
             <tbody id="transactions_target">
                 {{#transactions}}
                 <tr>
+                    <td>{{timestamp}}</td>
                     <td>${{amount}} USD</td>
                     <td><a href="https://github.com/{{destination}}">{{destination}}</a></td>
                     <td><pre>{{description}}</pre></td>
