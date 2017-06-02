@@ -26,7 +26,7 @@ public class CoinbaseTransactionParser {
   }
   
   public String parseAmountInBitcoin() {
-    return coinbaseTransaction.getAmountBtc().getAmount().abs()
+    return coinbaseTransaction.getAmount().getAmount().abs()
                               .toPlainString();
   }
 
