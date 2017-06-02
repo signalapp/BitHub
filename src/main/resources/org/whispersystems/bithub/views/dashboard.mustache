@@ -122,6 +122,7 @@
             <thead>
             <tr>
                 <th>USD</th>
+                <th>BTC</th>
                 <th>Author</th>
                 <th>Description</th>
                 <th>Commit</th>
@@ -131,6 +132,7 @@
                 {{#transactions}}
                 <tr>
                     <td>${{amount}} USD</td>
+                    <td>${{amountBtc}} BTC</td>
                     <td><a href="https://github.com/{{destination}}">{{destination}}</a></td>
                     <td><pre>{{description}}</pre></td>
                     <td><a href="{{commitUrl}}">{{commitSha}}</a></td>

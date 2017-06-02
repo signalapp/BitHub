@@ -144,6 +144,7 @@ public class CacheManager implements Managed {
 
           transactions.add(new Transaction(parser.parseDestinationFromMessage(),
                                            parser.parseAmountInDollars(exchangeRate),
+                                           parser.parseAmountInBitcoin(),
                                            url, sha, parser.parseTimestamp(),
                                            description));
 

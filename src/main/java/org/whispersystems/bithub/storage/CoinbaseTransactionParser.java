@@ -24,6 +24,11 @@ public class CoinbaseTransactionParser {
                               .setScale(2, RoundingMode.CEILING)
                               .toPlainString();
   }
+  
+  public String parseAmountInBitcoin() {
+    return coinbaseTransaction.getAmount().getAmount().abs()
+                              .toPlainString();
+  }
 
   public String parseTimestamp() throws ParseException {
     DateTime          timestamp = coinbaseTransaction.getCreatedAt();
