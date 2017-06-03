@@ -25,7 +25,8 @@ Running
 
 1. Create a GitHub account for your BitHub server.
 1. Create a Coinbase account for your BitHub server.
-1. Add the above credentials to `config/sample.yml`
+1. Make a copy of the configuration sample: `cp config/sample.yml config/yourconfig.yml`
+1. Add the above credentials to `config/yourconfig.yml`
 1. Execute `$ java -jar target/BitHub-0.1.jar server config/yourconfig.yml`
 
 Deploying To Heroku
